@@ -9,16 +9,18 @@ export default function ExperimentsPage() {
   const [experiments, setExperiments] = useState<any[]>([]);
 
   useEffect(() => {
-
     fetch("/api/experiments")
       .then((res) => res.json())
       .then((data) => {
-        setExperiments(data);
+        if (Array.isArray(data)) {
+          setExperiments(data);
+        } else if (Array.isArray(data.data)) {
+          setExperiments(data.data);
+        } else {
+          setExperiments([]);
+        }
       })
-      .catch((error) => {
-        console.error("Error fetching experiments:", error);
-      });
-
+      .catch(() => setExperiments([]));
   }, []);
 
   return (
@@ -26,7 +28,7 @@ export default function ExperimentsPage() {
 
       <h1 className={styles.title}>Experiments</h1>
 
-      <Link href="/create-experiment">
+      <Link href="/experiments/create">
         <button className={styles.createButton}>
           + Create Experiment
         </button>
@@ -34,27 +36,27 @@ export default function ExperimentsPage() {
 
       <div className={styles.grid}>
 
-        {experiments.map((exp) => (
+        {experiments.length === 0 ? (
+          <p>No experiments found</p>
+        ) : (
+          experiments.map((exp) => (
+            <Link key={exp.uuid} href={`/experiments/${exp.uuid}`}>
+              <div className={styles.card}>
+                <h3>{exp.name}</h3>
 
-          <Link key={exp.uuid} href={`/experiments/${exp.uuid}`}>
+                <p>
+                  {exp.description
+                    ? exp.description.substring(0, 120) + "..."
+                    : "No description"}
+                </p>
 
-            <div className={styles.card}>
-
-              <h3>{exp.name}</h3>
-
-              <p>
-                {exp.description?.substring(0,120)}...
-              </p>
-
-              <span className={styles.view}>
-                View Experiment →
-              </span>
-
-            </div>
-
-          </Link>
-
-        ))}
+                <span className={styles.view}>
+                  View Experiment →
+                </span>
+              </div>
+            </Link>
+          ))
+        )}
 
       </div>
 

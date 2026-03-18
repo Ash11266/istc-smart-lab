@@ -16,7 +16,7 @@ export default function Home() {
             <button className={styles.navButton}>Experiments</button>
           </Link>
 
-          <Link href="/create-experiment">
+          <Link href="/experiments/create">
             <button className={styles.primaryButton}>Create Experiment</button>
           </Link>
         </div>
@@ -41,7 +41,7 @@ export default function Home() {
             </button>
           </Link>
 
-          <Link href="/create-experiment">
+          <Link href="/experiments/create">
             <button className={styles.secondaryButton}>
               Create Experiment
             </button>
