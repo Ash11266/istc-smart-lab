@@ -80,9 +80,6 @@ export default function ExperimentsPage() {
                       <div className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold font-mono text-xs">
                         {exp.uuid ? exp.uuid.substring(0, 4) : "NEW"}
                       </div>
-                      <span className="inline-flex items-center justify-center bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2.5 py-0.5 rounded-full text-xs font-semibold">
-                        Active
-                      </span>
                     </div>
 
                     <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-3 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2">
