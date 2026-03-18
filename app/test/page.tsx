@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 
+// ✅ Define proper type
 type MqttMessage = {
   device: string;
   metric: string;
@@ -12,23 +13,21 @@ type MqttMessage = {
 export default function Dashboard() {
   const [data, setData] = useState<MqttMessage[]>([]);
   const [connected, setConnected] = useState(false);
-
-  // ✅ useRef instead of state
-  const socketRef = useRef<WebSocket | null>(null);
+  const [socket, setSocket] = useState<WebSocket | null>(null);
 
   function connect() {
     if (connected) return;
 
     const ws = new WebSocket("ws://localhost:1880/mqtt-stream");
-    socketRef.current = ws;
 
     ws.onopen = () => {
-      console.log("Connected");
+      console.log("Connected to Node-RED WebSocket");
       setConnected(true);
     };
 
     ws.onmessage = (event) => {
       const message: MqttMessage = JSON.parse(event.data);
+
       setData(prev => [...prev, message]);
     };
 
@@ -36,14 +35,13 @@ export default function Dashboard() {
       console.log("Disconnected");
       setConnected(false);
     };
+
+    setSocket(ws);
   }
 
   function disconnect() {
-    if (socketRef.current) {
-      socketRef.current.close();
-      socketRef.current = null;
-      setConnected(false);
-    }
+    socket?.close();
+    setConnected(false);
   }
 
   return (
@@ -60,11 +58,13 @@ export default function Dashboard() {
 
       <hr />
 
-      {data.map((d, i) => (
-        <div key={i}>
-          <strong>{d.device}</strong> — {d.metric}: {d.value}
-        </div>
-      ))}
+      <div>
+        {data.map((d, i) => (
+          <div key={i}>
+            <strong>{d.device}</strong> — {d.metric}: {d.value}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
