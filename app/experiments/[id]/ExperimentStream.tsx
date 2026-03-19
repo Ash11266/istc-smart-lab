@@ -9,7 +9,12 @@ type MqttMessage = {
   timestamp: string;
 };
 
-export default function ExperimentStream() {
+export default function ExperimentStream({ dataValues }: { dataValues?: string }) {
+  // Parse allowed metrics
+  const allowedMetrics = dataValues 
+    ? dataValues.split(",").map(v => v.trim().toLowerCase()).filter(Boolean) 
+    : [];
+
   const [data, setData] = useState<MqttMessage[]>([]);
   const [connected, setConnected] = useState(false);
   const [socket, setSocket] = useState<WebSocket | null>(null);
@@ -39,6 +44,11 @@ export default function ExperimentStream() {
     ws.onmessage = (event) => {
       const message: MqttMessage = JSON.parse(event.data);
       const currentDevice = selectedDeviceRef.current;
+
+      // Filter by metric if dataValues are provided
+      if (allowedMetrics.length > 0 && message.metric && !allowedMetrics.includes(message.metric.toLowerCase())) {
+        return; // Ignore this message as it doesn't match the required metrics
+      }
 
       // always uses latest value
       if (!currentDevice || message.device === currentDevice) {

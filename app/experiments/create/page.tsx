@@ -10,6 +10,7 @@ export default function CreateExperiment() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [components, setComponents] = useState("");
+  const [dataValues, setDataValues] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: any) => {
@@ -22,7 +23,7 @@ export default function CreateExperiment() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, description, components }),
+        body: JSON.stringify({ name, description, components, dataValues }),
       });
 
       const data = await res.json();
@@ -101,6 +102,23 @@ export default function CreateExperiment() {
             />
             <p className="text-xs text-slate-500 mt-2">
               Comma-separated list of primary devices used in this setup.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+             <label htmlFor="dataValues" className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Data Values (Metrics)
+            </label>
+            <input
+              id="dataValues"
+              type="text"
+              placeholder="e.g. temperature, humidity, voc"
+              value={dataValues}
+              onChange={(e) => setDataValues(e.target.value)}
+              className="block w-full px-4 py-3.5 border border-slate-300 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm"
+            />
+            <p className="text-xs text-slate-500 mt-2">
+              Comma-separated list of metrics this experiment should receive via the websocket stream. Leave blank to receive all.
             </p>
           </div>
 

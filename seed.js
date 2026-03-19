@@ -36,26 +36,31 @@ async function seed() {
         name: 'Alpha Node Sensor Diagnostic',
         description: 'Testing latency and packet loss of the alpha node sensors under heavy load conditions.',
         components: 'ESP32, DHT22, MPU6050',
+        dataValues: 'temperature, humidity, acceleration',
       },
       {
         name: 'Thermal Camera Array Calibration',
         description: 'Calibrating the thermal visualizer for the new smart lab monitoring dashboard to detect hotspot anomalies.',
         components: 'Raspberry Pi 4, MLX90640, Active Cooling Unit',
+        dataValues: 'temperature, status',
       },
       {
         name: 'Battery Discharge Kinetics',
         description: 'Evaluating voltage drops on Li-Po batteries during sustained transmission intervals.',
         components: 'INA219, Arduino Nano 33 BLE, 18650 Cells',
+        dataValues: 'voltage, current, power',
       },
       {
         name: 'Automated Greenhouse Climate Control',
         description: 'Regulating humidity and soil moisture for optimal plant growth in a controlled ecosystem.',
         components: 'NodeMCU, Soil Moisture Sensor, Relay Module, Water Pump',
+        dataValues: 'humidity, soil_moisture, temperature',
       },
       {
         name: 'Machine Learning Edge Inference',
         description: 'Running a lightweight TensorFlow Lite model to classify acoustic anomalies in real-time.',
         components: 'Jetson Nano, USB Microphone Array',
+        dataValues: 'noise_level, classification',
       }
     ];
 
@@ -67,6 +72,7 @@ async function seed() {
         name VARCHAR(255) NOT NULL,
         description TEXT,
         components VARCHAR(500),
+        dataValues VARCHAR(500),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
@@ -79,11 +85,11 @@ async function seed() {
     for (const exp of experiments) {
       const uuid = uuidv4();
       await connection.execute(`
-        INSERT INTO experiments (uuid, name, description, components)
-         VALUES (?, ?, ?, ?)\`,
-        [uuid, exp.name, exp.description, exp.components]`
+        INSERT INTO experiments (uuid, name, description, components, dataValues)
+         VALUES (?, ?, ?, ?, ?)`,
+        [uuid, exp.name, exp.description, exp.components, exp.dataValues]
       );
-      console.log(\`✅ Inserted: \${exp.name}\`);
+      console.log(`✅ Inserted: ${exp.name}`);
     }
 
     console.log('🎉 Seeding completed successfully!');

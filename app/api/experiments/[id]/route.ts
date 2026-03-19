@@ -8,7 +8,7 @@ export async function GET(
   try {
 
     const [rows]: any = await db.query(
-      "SELECT uuid, name, description, components FROM experiments WHERE uuid = ?",
+      "SELECT uuid, name, description, components, dataValues FROM experiments WHERE uuid = ?",
       [params.id]
     );
 

@@ -26,14 +26,14 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const { name, description, components } = body;
+    const { name, description, components, dataValues } = body;
 
     const uuid = uuidv4();
 
     await db.query(
-      `INSERT INTO experiments (uuid, name, description, components)
-       VALUES (?, ?, ?, ?)`,
-      [uuid, name, description, components]
+      `INSERT INTO experiments (uuid, name, description, components, dataValues)
+       VALUES (?, ?, ?, ?, ?)`,
+      [uuid, name, description, components, dataValues]
     );
 
     return NextResponse.json({
