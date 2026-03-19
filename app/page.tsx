@@ -12,7 +12,7 @@ export default function Home() {
 
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 text-sm font-medium mb-8 border border-indigo-100 dark:border-indigo-800/50">
           <span className="flex h-2 w-2 rounded-full bg-indigo-600 dark:bg-indigo-400"></span>
-          CSIO Smart Lab Platform
+          ISTC Smart Lab Platform
         </div>
 
         <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-6">
@@ -23,7 +23,7 @@ export default function Home() {
         </h1>
 
         <p className="max-w-2xl text-lg md:text-xl text-slate-600 dark:text-slate-300 mb-10 leading-relaxed">
-          Welcome to the CSIO Smart Lab Dashboard. This platform allows
+          Welcome to the ISTC Smart Lab Dashboard. This platform allows
           researchers and students to manage and monitor laboratory
           experiments using an IoT and SQL powered system.
         </p>

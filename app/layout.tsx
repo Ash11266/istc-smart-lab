@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CSIO Smart Lab",
+  title: "ISTC Smart Lab",
   description: "IoT and SQL powered system for managing and monitoring laboratory experiments.",
 };
 
