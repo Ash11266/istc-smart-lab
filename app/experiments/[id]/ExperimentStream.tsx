@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
+import MetricLineChart from "./MetricLineChart";
 
 type MqttMessage = {
   device: string;
@@ -30,6 +31,13 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
     selectedDeviceRef.current = selectedDevice;
   }, [selectedDevice]);
 
+  // Determine active metrics
+  const metricsToDisplay = useMemo(() => {
+    if (allowedMetrics.length > 0) return allowedMetrics;
+    const unique = new Set(data.map(d => d.metric));
+    return Array.from(unique).filter(Boolean);
+  }, [data, allowedMetrics]);
+
   function connect() {
     if (connected) return;
 
@@ -52,7 +60,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
 
       // always uses latest value
       if (!currentDevice || message.device === currentDevice) {
-        setData((prev) => [...prev.slice(-49), message]);
+        setData((prev) => [...prev.slice(-199), message]);
       }
     };
 
@@ -140,6 +148,19 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
            <span className="text-lg font-bold text-slate-900 dark:text-white truncate w-full">{selectedDevice || "All Devices"}</span>
         </div>
       </div>
+
+      {/* Metric Charts */}
+      {metricsToDisplay.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full mt-4 mb-2">
+          {metricsToDisplay.map((metric) => (
+            <MetricLineChart 
+              key={metric} 
+              metric={metric} 
+              data={data.filter(d => d.metric && d.metric.toLowerCase() === metric.toLowerCase())} 
+            />
+          ))}
+        </div>
+      )}
 
       <div className="bg-slate-900 dark:bg-black rounded-xl shadow-inner border border-slate-800 overflow-hidden flex flex-col h-[400px]">
         <div className="bg-slate-800/50 border-b border-slate-700/50 px-4 py-3 flex items-center justify-between">
