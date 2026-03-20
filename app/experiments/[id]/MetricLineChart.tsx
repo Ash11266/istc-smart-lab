@@ -17,25 +17,26 @@ interface MetricLineChartProps {
 
 export default function MetricLineChart({ metric, data }: MetricLineChartProps) {
   const option = useMemo(() => {
-    const timestamps = data.map((d) => {
+    const timeData = data.map((d) => {
       const date = d.timestamp ? new Date(d.timestamp) : new Date();
-      return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
-    });
-    
-    const values = data.map((d) => {
       const val = typeof d.value === 'string' ? parseFloat(d.value) : d.value;
-      return isNaN(val) ? 0 : val;
+      return [date.getTime(), isNaN(val) ? 0 : val];
     });
-
-    const latestValue = values.length > 0 ? values[values.length - 1] : null;
 
     return {
       tooltip: {
         trigger: 'axis',
-        axisPointer: { type: 'shadow' },
+        axisPointer: { type: 'line' },
         backgroundColor: '#1e293b',
         borderColor: '#334155',
-        textStyle: { color: '#f8fafc' }
+        textStyle: { color: '#f8fafc' },
+        formatter: (params: any) => {
+          const pt = params[0];
+          if (!pt) return '';
+          const date = new Date(pt.value[0]);
+          const timeStr = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
+          return `${timeStr}<br/>${pt.seriesName}: <b>${pt.value[1]}</b>`;
+        }
       },
       grid: {
         left: '2%',
@@ -45,10 +46,16 @@ export default function MetricLineChart({ metric, data }: MetricLineChartProps) 
         containLabel: true
       },
       xAxis: {
-        type: 'category',
-        data: timestamps,
+        type: 'time',
         axisLine: { lineStyle: { color: '#475569' } },
-        axisLabel: { color: '#94a3b8', fontSize: 11 },
+        axisLabel: { 
+          color: '#94a3b8', 
+          fontSize: 11,
+          formatter: (value: number) => {
+            const date = new Date(value);
+            return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
+          }
+        },
         axisTick: { show: true, lineStyle: { color: '#475569' } },
         splitLine: { show: true, lineStyle: { color: '#334155', type: 'solid' } }
       },
@@ -67,7 +74,7 @@ export default function MetricLineChart({ metric, data }: MetricLineChartProps) 
           showSymbol: true,
           symbolSize: 6,
           symbol: 'circle',
-          data: values,
+          data: timeData,
           lineStyle: {
             width: 2,
             color: '#3b82f6' // Solid blue for mathematical crispness
