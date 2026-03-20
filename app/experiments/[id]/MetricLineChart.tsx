@@ -49,41 +49,31 @@ export default function MetricLineChart({ metric, data }: MetricLineChartProps) 
         data: timestamps,
         axisLine: { lineStyle: { color: '#475569' } },
         axisLabel: { color: '#94a3b8', fontSize: 11 },
-        axisTick: { show: false }
+        axisTick: { show: true, lineStyle: { color: '#475569' } },
+        splitLine: { show: true, lineStyle: { color: '#334155', type: 'solid' } }
       },
       yAxis: {
         type: 'value',
-        splitLine: { lineStyle: { color: '#334155', type: 'dashed' } },
-        axisLine: { show: false },
+        splitLine: { show: true, lineStyle: { color: '#334155', type: 'solid' } },
+        axisLine: { show: true, lineStyle: { color: '#475569' } },
+        axisTick: { show: true, lineStyle: { color: '#475569' } },
         axisLabel: { color: '#94a3b8', fontSize: 11 }
       },
       series: [
         {
           name: metric,
           type: 'line',
-          smooth: true,
-          showSymbol: false,
+          smooth: false,
+          showSymbol: true,
+          symbolSize: 6,
+          symbol: 'circle',
           data: values,
-          areaStyle: {
-            color: {
-              type: 'linear',
-              x: 0, y: 0, x2: 0, y2: 1,
-              colorStops: [
-                { offset: 0, color: 'rgba(59, 130, 246, 0.4)' }, // blue-500 fading out
-                { offset: 1, color: 'rgba(16, 185, 129, 0.0)' }  // emerald-500 transparent
-              ]
-            }
-          },
           lineStyle: {
-            width: 3,
-            color: {
-              type: 'linear',
-              x: 0, y: 0, x2: 1, y2: 0,
-              colorStops: [
-                { offset: 0, color: '#3b82f6' }, // blue-500
-                { offset: 1, color: '#10b981' }  // emerald-500
-              ]
-            }
+            width: 2,
+            color: '#3b82f6' // Solid blue for mathematical crispness
+          },
+          itemStyle: {
+            color: '#3b82f6' // Match point color to the line
           },
           animationDuration: 300,
           animationEasing: 'cubicOut'
