@@ -3,18 +3,19 @@ import { v4 as uuidv4 } from 'uuid';
 import { config } from 'dotenv';
 import path from 'path';
 import fs from 'fs';
+import db from "@/lib/db";
 
 // Load env vars
-const envPath = path.resolve(process.cwd(), '.env');
-const envLocalPath = path.resolve(process.cwd(), '.env.local');
+// const envPath = path.resolve(process.cwd(), '.env');
+// const envLocalPath = path.resolve(process.cwd(), '.env.local');
 
-if (fs.existsSync(envLocalPath)) {
-  config({ path: envLocalPath });
-} else if (fs.existsSync(envPath)) {
-  config({ path: envPath });
-} else {
-  console.log('No .env or .env.local file found.');
-}
+// if (fs.existsSync(envLocalPath)) {
+//   config({ path: envLocalPath });
+// } else if (fs.existsSync(envPath)) {
+//   config({ path: envPath });
+// } else {
+//   console.log('No .env or .env.local file found.');
+// }
 
 async function seed() {
   console.log('🌱 Starting database seeding...');
@@ -61,6 +62,12 @@ async function seed() {
         description: 'Running a lightweight TensorFlow Lite model to classify acoustic anomalies in real-time.',
         components: 'Jetson Nano, USB Microphone Array',
         dataValues: 'noise_level, classification',
+      },
+      {
+        name: 'Distance Measurement',
+        description: 'Measuring Distance using an Ultrasonic Sensor and ESP8266',
+        components: 'Esp8266, Ultrasonic Sensor',
+        dataValues: 'distance',
       }
     ];
 
