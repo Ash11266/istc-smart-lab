@@ -12,8 +12,8 @@ type MqttMessage = {
 
 export default function ExperimentStream({ dataValues }: { dataValues?: string }) {
   // Parse allowed metrics
-  const allowedMetrics = dataValues 
-    ? dataValues.split(",").map(v => v.trim().toLowerCase()).filter(Boolean) 
+  const allowedMetrics = dataValues
+    ? dataValues.split(",").map(v => v.trim().toLowerCase()).filter(Boolean)
     : [];
 
   const [data, setData] = useState<MqttMessage[]>([]);
@@ -84,7 +84,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
 
   function downloadCSV() {
     if (data.length === 0) return;
-    
+
     const headers = ["Timestamp", "Device", "Metric", "Value"];
     const rows = data.map(d => [
       d.timestamp || new Date().toISOString(),
@@ -92,12 +92,12 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
       d.metric,
       d.value
     ]);
-    
+
     const csvContent = [
       headers.join(","),
       ...rows.map(r => r.join(","))
     ].join("\n");
-    
+
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -111,16 +111,15 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
   return (
     <div className="flex flex-col gap-6 w-full text-slate-900">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        
+
         <div className="flex items-center gap-3 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0">
           <button
             onClick={downloadCSV}
             disabled={data.length === 0}
-            className={`flex items-center gap-2 px-6 py-2.5 font-bold uppercase tracking-wide text-sm transition-colors border-2 shadow-sm ${
-              data.length === 0 
-                ? "bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed" 
+            className={`flex items-center gap-2 px-6 py-2.5 font-bold uppercase tracking-wide text-sm transition-colors border-2 shadow-sm ${data.length === 0
+                ? "bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed"
                 : "bg-white border-[#003366] text-[#003366] hover:bg-slate-50"
-            }`}
+              }`}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
             Export CSV
@@ -129,11 +128,10 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
           <button
             onClick={connect}
             disabled={connected}
-            className={`relative px-6 py-2.5 font-bold uppercase tracking-wide text-sm transition-colors border-2 shadow-sm ${
-              connected 
-                ? "bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed" 
+            className={`relative px-6 py-2.5 font-bold uppercase tracking-wide text-sm transition-colors border-2 shadow-sm ${connected
+                ? "bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed"
                 : "bg-[#003366] border-[#003366] hover:bg-slate-900 text-white"
-            }`}
+              }`}
           >
             {connected && (
               <span className="absolute flex h-2.5 w-2.5 top-[-3px] right-[-3px]">
@@ -143,15 +141,14 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
             )}
             {connected ? "Connected" : "Connect Stream"}
           </button>
-          
+
           <button
             onClick={disconnect}
             disabled={!connected}
-            className={`px-6 py-2.5 font-bold uppercase tracking-wide text-sm transition-colors border-2 shadow-sm ${
-              !connected 
-                ? "bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed" 
+            className={`px-6 py-2.5 font-bold uppercase tracking-wide text-sm transition-colors border-2 shadow-sm ${!connected
+                ? "bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed"
                 : "bg-red-700 border-red-700 hover:bg-red-800 text-white"
-            }`}
+              }`}
           >
             Disconnect
           </button>
@@ -179,8 +176,8 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
         </div>
 
         <div className="bg-slate-50 p-4 border border-slate-300 flex flex-col justify-center items-center text-center">
-           <span className="text-xs uppercase tracking-widest text-slate-600 font-bold mb-1">Active Filter</span>
-           <span className="text-lg font-bold text-[#003366] truncate w-full">{selectedDevice || "ALL DEVICES"}</span>
+          <span className="text-xs uppercase tracking-widest text-slate-600 font-bold mb-1">Active Filter</span>
+          <span className="text-lg font-bold text-[#003366] truncate w-full">{selectedDevice || "NO DEVICE SELECTED"}</span>
         </div>
       </div>
 
@@ -189,9 +186,9 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full mt-4 mb-2">
           {metricsToDisplay.map((metric) => (
             <div key={metric} className="border border-slate-300 bg-white shadow-sm p-4">
-              <MetricLineChart 
-                metric={metric} 
-                data={data.filter(d => d.metric && d.metric.toLowerCase() === metric.toLowerCase())} 
+              <MetricLineChart
+                metric={metric}
+                data={selectedDevice ? data.filter(d => d.metric && d.metric.toLowerCase() === metric.toLowerCase()) : []}
               />
             </div>
           ))}
@@ -211,14 +208,14 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
 
         <div className="p-4 overflow-y-auto font-mono text-xs sm:text-sm leading-relaxed flex-1 flex flex-col gap-1 custom-scrollbar">
           {data.length === 0 ? (
-             <div className="h-full flex flex-col items-center justify-center text-slate-500 gap-2 opacity-70">
-               <svg className="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-               <span className="uppercase tracking-widest font-bold">{connected ? "WAITING FOR DATA SEQUENCE..." : "SYSTEM DISCONNECTED - CONNECT TO START"}</span>
-             </div>
+            <div className="h-full flex flex-col items-center justify-center text-slate-500 gap-2 opacity-70">
+              <svg className="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+              <span className="uppercase tracking-widest font-bold">{connected ? "WAITING FOR DATA SEQUENCE..." : "SYSTEM DISCONNECTED - CONNECT TO START"}</span>
+            </div>
           ) : (
             data.map((d, i) => (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4 hover:bg-slate-900 p-1.5 transition-colors border-b border-slate-900"
               >
                 <div className="text-slate-500 shrink-0 font-bold whitespace-nowrap">
