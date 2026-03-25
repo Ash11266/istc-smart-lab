@@ -50,17 +50,45 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
     };
 
     ws.onmessage = (event) => {
-      const message: MqttMessage = JSON.parse(event.data);
-      const currentDevice = selectedDeviceRef.current;
+      try {
+        const raw = JSON.parse(event.data);
+        
+        const extractStringOrValue = (obj: any): string => {
+          if (obj === null || obj === undefined) return "";
+          if (typeof obj === 'object') {
+            return 'value' in obj ? String(obj.value) : JSON.stringify(obj);
+          }
+          return String(obj);
+        };
+        
+        const extractValue = (obj: any): number | string => {
+          if (obj === null || obj === undefined) return "";
+          if (typeof obj === 'object') {
+            return 'value' in obj ? obj.value : JSON.stringify(obj);
+          }
+          return obj;
+        };
 
-      // Filter by metric if dataValues are provided
-      if (allowedMetrics.length > 0 && message.metric && !allowedMetrics.includes(message.metric.toLowerCase())) {
-        return; // Ignore this message as it doesn't match the required metrics
-      }
+        const message: MqttMessage = {
+          device: extractStringOrValue(raw.device),
+          metric: extractStringOrValue(raw.metric),
+          value: extractValue(raw.value),
+          timestamp: raw.timestamp ? extractStringOrValue(raw.timestamp) : new Date().toISOString()
+        };
 
-      // always uses latest value
-      if (!currentDevice || message.device === currentDevice) {
-        setData((prev) => [...prev.slice(-199), message]);
+        const currentDevice = selectedDeviceRef.current;
+
+        // Filter by metric if dataValues are provided
+        if (allowedMetrics.length > 0 && message.metric && !allowedMetrics.includes(message.metric.toLowerCase())) {
+          return; // Ignore this message as it doesn't match the required metrics
+        }
+
+        // always uses latest value
+        if (!currentDevice || message.device === currentDevice) {
+          setData((prev) => [...prev.slice(-199), message]);
+        }
+      } catch (err) {
+        console.error("Error parsing MQTT websocket message:", err);
       }
     };
 

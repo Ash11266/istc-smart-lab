@@ -3,13 +3,14 @@ import db from "@/lib/db";
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> } // 👈 params is Promise now
 ) {
   try {
+    const { id } = await params; // 👈 MUST await
 
     const [rows]: any = await db.query(
       "SELECT uuid, name, description, components, dataValues FROM experiments WHERE uuid = ?",
-      [params.id]
+      [id]
     );
 
     if (rows.length === 0) {
@@ -22,13 +23,11 @@ export async function GET(
     return NextResponse.json(rows[0]);
 
   } catch (error) {
-
     console.error("Database error:", error);
 
     return NextResponse.json(
       { message: "Database error" },
       { status: 500 }
     );
-
   }
 }

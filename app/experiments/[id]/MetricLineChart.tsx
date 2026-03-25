@@ -94,7 +94,10 @@ export default function MetricLineChart({ metric, data }: MetricLineChartProps) 
   const latestValue = useMemo(() => {
     if (isEmpty) return '--';
     const val = data[data.length - 1].value;
-    return typeof val === 'number' ? val.toFixed(2) : val;
+    if (typeof val === 'object' && val !== null) {
+      return JSON.stringify(val);
+    }
+    return typeof val === 'number' ? val.toFixed(2) : String(val);
   }, [data, isEmpty]);
 
   return (
