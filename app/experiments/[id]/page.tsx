@@ -13,6 +13,7 @@ export default function ExperimentPage({
 
   const [experiment, setExperiment] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [mlData, setMlData] = useState<any>(null);
 
   useEffect(() => {
     fetch(`/api/experiments/${id}`)
@@ -32,6 +33,12 @@ export default function ExperimentPage({
         setLoading(false);
       });
   }, [id]);
+  useEffect(() => {
+  fetch("http://127.0.0.1:8000/ml-analytics")
+    .then(res => res.json())
+    .then(data => setMlData(data))
+    .catch(err => console.log("ML error:", err));
+}, []);
 
   if (loading) {
     return (
@@ -141,6 +148,19 @@ export default function ExperimentPage({
             Live Telemetry View
           </h3>
           <ExperimentStream dataValues={experiment.dataValues} />
+          <div className="mt-6 p-4 border border-slate-300 bg-slate-50">
+  <h3 className="text-lg font-bold text-[#003366] mb-2">
+    ML Insights
+  </h3>
+
+  {mlData?.status === "no_data" && (
+    <p>Waiting for ML data...</p>
+  )}
+
+  {mlData?.status === "ok" && (
+    <p>Prediction: {mlData.prediction}</p>
+  )}
+</div>
         </div>
 
       </div>
