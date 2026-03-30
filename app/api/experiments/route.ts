@@ -1,48 +1,32 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 
-export async function GET() {
+export async function GET(
+    req: Request,
+    { params }: { params: Promise<{ id: string }> } // 👈 params is Promise now
+) {
     try {
-        const [rows]: any = await db.query("SELECT * FROM experiments");
+        const { id } = await params; // 👈 MUST await
 
-        return NextResponse.json(rows); // 🔥 IMPORTANT
-
-    } catch (error) {
-        console.error("Fetch error:", error);
-
-        return NextResponse.json(
-            { message: "Failed to fetch experiments" },
-            { status: 500 }
-        );
-    }
-}
-
-
-// ✅ CREATE EXPERIMENT
-export async function POST(req: Request) {
-    try {
-        const body = await req.json();
-
-        const { name, description, components, dataValues } = body;
-
-        const uuid = uuidv4();
-
-        await db.query(
-            `INSERT INTO experiments (uuid, name, description, components, dataValues)
-       VALUES (?, ?, ?, ?, ?)`,
-            [uuid, name, description, components, dataValues]
+        const [rows]: any = await db.query(
+            "SELECT uuid, name, description, components, dataValues FROM experiments WHERE uuid = ?",
+            [id]
         );
 
-        return NextResponse.json({
-            success: true,
-            message: "Experiment created",
-        });
+        if (rows.length === 0) {
+            return NextResponse.json(
+                { message: "Experiment not found" },
+                { status: 404 }
+            );
+        }
+
+        return NextResponse.json(rows[0]);
 
     } catch (error) {
-        console.error("Insert error:", error);
+        console.error("Database error:", error);
 
         return NextResponse.json(
-            { success: false },
+            { message: "Database error" },
             { status: 500 }
         );
     }
