@@ -1,7 +1,7 @@
 import Link from "next/link";
 import ExperimentStream from "./ExperimentStream";
 import AIBox from "@/components/AIBox";
-
+import AIChat from "@/components/AIChat";
 export default async function ExperimentPage({
   params,
 }: {
@@ -79,7 +79,7 @@ export default async function ExperimentPage({
       {/* AI */}
       <div className="mt-6">
         <h2 className="text-2xl font-bold mb-3 text-[#003366]">
-          🤖 AI Analysis
+     
         </h2>
 
         <AIBox
@@ -88,6 +88,14 @@ export default async function ExperimentPage({
           dataValues={experiment.dataValues}
         />
       </div>
+      {/* 🤖 AI CHAT */}
+<div className="mt-6">
+  <AIChat
+  description={experiment.description}
+  components={experiment.components}
+  dataValues={experiment.dataValues}
+/>
+</div>
 
     </div>
   );

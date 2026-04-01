@@ -7,18 +7,28 @@ export async function POST(req: Request) {
     const description = body.description || "";
     const components = body.components || "";
     const dataValues = body.dataValues || "";
+const prompt = `
+You are a professional lab assistant AI.
 
-    const prompt = `
-You are an intelligent lab assistant AI.
+Give a short and clean explanation.
 
-Explain this experiment clearly:
+Format STRICTLY like this:
 
-- What is happening
-- What components are used
-- What data is measured
-- Why it matters
+Overview:
+(2-3 lines)
 
-Keep it simple.
+Components:
+- item 1
+- item 2
+
+Data Measured:
+- item 1
+- item 2
+
+Importance:
+(2-3 lines)
+
+Do NOT use * symbols. Use proper formatting.
 
 Experiment:
 ${description}

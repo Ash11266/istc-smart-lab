@@ -43,16 +43,34 @@ export default function AIBox({
     <div className="mt-6">
       {/* Title */}
       <h2 className="text-xl font-bold mb-3 text-[#003366]">
-        🤖 AI Explanation
+      Experiment Insights
       </h2>
 
       {/* Button */}
-      <button
-        onClick={handleAI}
-        className="px-5 py-2 bg-[#003366] text-white font-semibold rounded hover:bg-slate-900 transition"
-      >
-        {loading ? "Generating..." : "Explain with AI"}
-      </button>
+{!aiText && (
+  <button
+    onClick={handleAI}
+    disabled={loading}
+    className={`flex items-center gap-2 px-5 py-2 font-semibold text-white rounded transition
+      ${loading 
+        ? "bg-slate-400 cursor-not-allowed" 
+        : "bg-[#003366] hover:bg-slate-900"}
+    `}
+  >
+    {loading ? (
+      <>
+        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24"></svg>
+        Generating Insights...
+      </>
+    ) : (
+      <>
+        <svg className="w-5 h-5" viewBox="0 0 24 24"></svg>
+        Generate Insights
+      </>
+    )}
+  </button>
+)}
+
 
       {/* Output */}
       {aiText && (
