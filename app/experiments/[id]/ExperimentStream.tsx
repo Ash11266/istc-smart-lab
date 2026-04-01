@@ -41,8 +41,9 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
   function connect() {
     if (connected) return;
 
-    // Use absolute URL if possible, assuming ws://localhost:1880/mqtt-stream from original logic
-    const ws = new WebSocket("ws://localhost:1880/mqtt-stream");
+    const ws = new WebSocket(
+      `ws://${process.env.NEXT_PUBLIC_WS_HOST}:${process.env.NEXT_PUBLIC_WS_PORT}${process.env.NEXT_PUBLIC_WS_PATH}`
+    );
 
     ws.onopen = () => {
       console.log("Connected");
@@ -52,7 +53,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
     ws.onmessage = (event) => {
       try {
         const raw = JSON.parse(event.data);
-        
+
         const extractStringOrValue = (obj: any): string => {
           if (obj === null || obj === undefined) return "";
           if (typeof obj === 'object') {
@@ -60,7 +61,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
           }
           return String(obj);
         };
-        
+
         const extractValue = (obj: any): number | string => {
           if (obj === null || obj === undefined) return "";
           if (typeof obj === 'object') {
@@ -145,8 +146,8 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
             onClick={downloadCSV}
             disabled={data.length === 0}
             className={`flex items-center gap-2 px-6 py-2.5 font-bold uppercase tracking-wide text-sm transition-colors border-2 shadow-sm ${data.length === 0
-                ? "bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed"
-                : "bg-white border-[#003366] text-[#003366] hover:bg-slate-50"
+              ? "bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed"
+              : "bg-white border-[#003366] text-[#003366] hover:bg-slate-50"
               }`}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
@@ -157,8 +158,8 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
             onClick={connect}
             disabled={connected}
             className={`relative px-6 py-2.5 font-bold uppercase tracking-wide text-sm transition-colors border-2 shadow-sm ${connected
-                ? "bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed"
-                : "bg-[#003366] border-[#003366] hover:bg-slate-900 text-white"
+              ? "bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed"
+              : "bg-[#003366] border-[#003366] hover:bg-slate-900 text-white"
               }`}
           >
             {connected && (
@@ -174,8 +175,8 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
             onClick={disconnect}
             disabled={!connected}
             className={`px-6 py-2.5 font-bold uppercase tracking-wide text-sm transition-colors border-2 shadow-sm ${!connected
-                ? "bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed"
-                : "bg-red-700 border-red-700 hover:bg-red-800 text-white"
+              ? "bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed"
+              : "bg-red-700 border-red-700 hover:bg-red-800 text-white"
               }`}
           >
             Disconnect
