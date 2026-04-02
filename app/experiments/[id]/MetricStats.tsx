@@ -65,7 +65,7 @@ export default function MetricStats({ data }: MetricStatsProps) {
             <span className="font-mono text-2xl font-bold text-[#003366]">{stats.avg}</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-slate-500 text-xs leading-none mb-1 font-bold uppercase tracking-widest">ST. DEV.</span>
+            <span className="text-slate-500 text-xs leading-none mb-1 font-bold uppercase tracking-widest">ST DEV</span>
             <span className="font-mono text-2xl font-bold text-[#003366]">{stats.stdev}</span>
           </div>
           <div className="flex flex-col">
