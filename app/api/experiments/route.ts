@@ -6,7 +6,10 @@ import { v4 as uuidv4 } from "uuid";
 // ✅ GET ALL EXPERIMENTS
 export async function GET() {
     try {
+        console.log("API: Handling GET /api/experiments...");
+        console.log("API: calling db.query...");
         const [rows]: any = await db.query("SELECT * FROM experiments");
+        console.log("API: db.query successful, returning rows:", rows.length);
 
         return NextResponse.json(rows); // 🔥 IMPORTANT
 
