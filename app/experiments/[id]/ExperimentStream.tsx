@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo } from "react";
-import MetricLineChart from "./MetricLineChart";
+import dynamic from "next/dynamic";
+import MetricStats from "./MetricStats";
+
+const MetricLineChart = dynamic(() => import("./MetricLineChart"), { ssr: false });
 
 type MqttMessage = {
   device: string;
@@ -212,15 +215,23 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
 
       {/* Metric Charts */}
       {metricsToDisplay.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full mt-4 mb-2">
-          {metricsToDisplay.map((metric) => (
-            <div key={metric} className="border border-slate-300 bg-white shadow-sm p-4">
-              <MetricLineChart
-                metric={metric}
-                data={selectedDevice ? data.filter(d => d.metric && d.metric.toLowerCase() === metric.toLowerCase()) : []}
-              />
-            </div>
-          ))}
+        <div className="flex flex-col gap-6 w-full mt-4 mb-2">
+          {metricsToDisplay.map((metric) => {
+            const chartData = selectedDevice ? data.filter(d => d.metric && d.metric.toLowerCase() === metric.toLowerCase()) : [];
+            return (
+              <div key={metric} className="flex flex-col xl:flex-row gap-4 w-full">
+                <div className="flex-1 border border-slate-300 bg-white shadow-sm p-4 min-w-0">
+                  <MetricLineChart
+                    metric={metric}
+                    data={chartData}
+                  />
+                </div>
+                <div className="w-full xl:w-64 shrink-0 border border-slate-300 bg-white shadow-sm p-4 flex flex-col justify-center">
+                  <MetricStats data={chartData} />
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
 
