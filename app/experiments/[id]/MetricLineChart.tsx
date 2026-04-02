@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useRef, useEffect } from 'react';
 import ReactECharts from 'echarts-for-react';
 
 type MqttMessage = {
@@ -16,6 +16,30 @@ interface MetricLineChartProps {
 }
 
 export default function MetricLineChart({ metric, data }: MetricLineChartProps) {
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(document.fullscreenElement === containerRef.current);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!containerRef.current) return;
+    if (!document.fullscreenElement) {
+      containerRef.current.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  };
+
   const option = useMemo(() => {
     const timeData = data.map((d) => {
       const date = d.timestamp ? new Date(d.timestamp) : new Date();
@@ -91,6 +115,32 @@ export default function MetricLineChart({ metric, data }: MetricLineChartProps) 
 
   const isEmpty = data.length === 0;
   
+  const stats = useMemo(() => {
+    if (isEmpty) return { min: '--', max: '--', avg: '--', stdev: '--' };
+    
+    const numericValues = data
+      .map(d => typeof d.value === 'string' ? parseFloat(d.value) : d.value)
+      .filter(val => typeof val === 'number' && !isNaN(val)) as number[];
+
+    if (numericValues.length === 0) return { min: '--', max: '--', avg: '--', stdev: '--' };
+
+    const min = Math.min(...numericValues);
+    const max = Math.max(...numericValues);
+    const sum = numericValues.reduce((a, b) => a + b, 0);
+    const avg = sum / numericValues.length;
+    
+    const squaredDiffs = numericValues.map(val => Math.pow(val - avg, 2));
+    const avgSquaredDiff = squaredDiffs.reduce((a, b) => a + b, 0) / numericValues.length;
+    const stdev = Math.sqrt(avgSquaredDiff);
+
+    return {
+      min: min.toFixed(2),
+      max: max.toFixed(2),
+      avg: avg.toFixed(2),
+      stdev: stdev.toFixed(2)
+    };
+  }, [data, isEmpty]);
+
   const latestValue = useMemo(() => {
     if (isEmpty) return '--';
     const val = data[data.length - 1].value;
@@ -101,22 +151,45 @@ export default function MetricLineChart({ metric, data }: MetricLineChartProps) 
   }, [data, isEmpty]);
 
   return (
-    <div className="bg-white p-2 w-full h-[320px] flex flex-col overflow-hidden transition-all">
-      <div className="flex items-center justify-between mb-4 border-b-2 border-slate-200 pb-2">
-        <div className="flex items-center gap-3">
+    <div ref={containerRef} className={`bg-white ${isFullscreen ? 'w-full h-[100dvh] p-6' : 'p-2 w-full h-[320px]'} flex flex-col overflow-hidden transition-all`}>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 border-b-2 border-slate-200 pb-2 gap-2">
+        <div className="flex items-center gap-3 flex-wrap">
             <h4 className="text-[#003366] font-bold text-lg tracking-wide uppercase">
               {metric}
             </h4>
             <div className="bg-slate-100 px-3 py-1 border border-slate-300 flex items-center gap-2">
                 <span className="text-[#003366] font-mono text-sm font-bold">{latestValue}</span>
             </div>
+            
+            {!isEmpty && stats.avg !== '--' && (
+              <div className="flex items-center gap-3 ml-2 border-l-2 border-slate-200 pl-4 py-1">
+                <div className="flex flex-col"><span className="text-slate-400 text-[10px] leading-none mb-1 font-bold">AVG</span><span className="font-mono text-xs font-bold text-[#003366]">{stats.avg}</span></div>
+                <div className="flex flex-col"><span className="text-slate-400 text-[10px] leading-none mb-1 font-bold">STD</span><span className="font-mono text-xs font-bold text-[#003366]">{stats.stdev}</span></div>
+                <div className="flex flex-col"><span className="text-slate-400 text-[10px] leading-none mb-1 font-bold">MIN</span><span className="font-mono text-xs font-bold text-[#003366]">{stats.min}</span></div>
+                <div className="flex flex-col"><span className="text-slate-400 text-[10px] leading-none mb-1 font-bold">MAX</span><span className="font-mono text-xs font-bold text-[#003366]">{stats.max}</span></div>
+              </div>
+            )}
         </div>
-        <div className="flex items-center gap-2">
-           <span className="relative flex h-2.5 w-2.5">
-             <span className="animate-ping absolute inline-flex h-full w-full bg-emerald-400 opacity-75"></span>
-             <span className="relative inline-flex h-2.5 w-2.5 bg-emerald-500"></span>
-           </span>
-           <span className="text-slate-600 text-xs font-bold uppercase tracking-widest">Live</span>
+        <div className="flex items-center gap-4 shrink-0">
+           <div className="flex items-center gap-2">
+             <span className="relative flex h-2.5 w-2.5">
+               <span className="animate-ping absolute inline-flex h-full w-full bg-emerald-400 opacity-75"></span>
+               <span className="relative inline-flex h-2.5 w-2.5 bg-emerald-500"></span>
+             </span>
+             <span className="text-slate-600 text-xs font-bold uppercase tracking-widest">Live</span>
+           </div>
+           
+           <button 
+             onClick={toggleFullscreen}
+             className="text-slate-500 hover:text-[#003366] transition-colors p-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-sm shadow-sm"
+             title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+           >
+             {isFullscreen ? (
+               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+             ) : (
+               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+             )}
+           </button>
         </div>
       </div>
       
