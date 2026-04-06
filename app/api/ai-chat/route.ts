@@ -2,47 +2,63 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-const { message, experiment } = await req.json();
-const lowerMsg = message.toLowerCase();
+    const { message, experiment, history = [] } = await req.json();
 
-let mode = "full";
+    const lowerMsg = message.toLowerCase();
 
-if (lowerMsg.includes("code")) mode = "code";
-else if (lowerMsg.includes("component")) mode = "components";
-else if (lowerMsg.includes("explain")) mode = "explanation";
-else if (lowerMsg.includes("suggest")) mode = "suggestions";
+    let mode = "full";
 
-const prompt = `
-You are a Smart Lab AI Assistant.
+    if (lowerMsg.includes("code")) mode = "code";
+    else if (lowerMsg.includes("component")) mode = "components";
+    else if (lowerMsg.includes("explain")) mode = "explanation";
+    else if (lowerMsg.includes("suggest")) mode = "suggestions";
+
+    const systemPrompt = `
+You are an intelligent Smart Lab AI Assistant.
+
 Mode: ${mode}
 
-Understand the user query and respond accordingly:
+IMPORTANT RULES:
+- Do NOT repeat previous answers
+- Answer ONLY the current question
+- Keep response concise and professional
+- Avoid unnecessary text
+- Suggestions must be max 2 points (1 line each)
+- No * symbols
 
-1. If user asks for "code":
-Return ONLY:
+RESPONSE FORMAT:
+
+👉 If mode = code:
 Code:
-<code here>
+<clean working code>
 
-2. If user asks for "components":
-Return ONLY:
-Components:
-- item 1
-- item 2
-
-3. If user asks for "explanation":
-Return ONLY:
 Explanation:
 <short explanation>
 
-4. If user asks for "suggestions":
-Return ONLY:
 Suggestions:
-- point 1
-- point 2
+- short improvement
+- short improvement
 
-5. If user asks for "full experiment" or general query:
-Return FULL format:
+👉 If mode = components:
+Components:
+- item 1
+- item 2
+- item 3
 
+👉 If mode = explanation:
+Explanation:
+<clear explanation>
+
+Suggestions:
+- short follow-up
+- short follow-up
+
+👉 If mode = suggestions:
+Suggestions:
+- short idea
+- short idea
+
+👉 If mode = full:
 Title:
 <short title>
 
@@ -51,29 +67,47 @@ Components:
 - item 2
 
 Code:
-<code>
+<clean code>
 
 Explanation:
 <short explanation>
 
 Suggestions:
-- point 1
-- point 2
+- short improvement
+- short improvement
 
-Rules:
-- No * symbols
-- Be concise and professional
-- Do NOT include unnecessary sections
-- Only return what is asked
+---
 
-Experiment Details:
+CONTEXT:
 Description: ${experiment?.description || "N/A"}
 Components: ${experiment?.components || "N/A"}
 Data: ${experiment?.dataValues || "N/A"}
-
-User Question:
-${message}
 `;
+
+    // 🧠 CLEAN MEMORY (only last 3 user messages)
+    const cleanHistory = history
+      .filter((msg: any) => msg.role === "user")
+      .slice(-3);
+
+    const contents = [
+      {
+        role: "user",
+        parts: [{ text: systemPrompt }],
+      },
+
+      // memory (ONLY user messages → avoids repetition bug)
+      ...cleanHistory.map((msg: any) => ({
+        role: "user",
+        parts: [{ text: msg.text }],
+      })),
+
+      // current question
+      {
+        role: "user",
+        parts: [{ text: message }],
+      },
+    ];
+
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
@@ -81,27 +115,31 @@ ${message}
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: prompt }],
-            },
-          ],
-        }),
+        body: JSON.stringify({ contents }),
       }
     );
 
     const data = await response.json();
 
-const text =
-  data.candidates?.[0]?.content?.parts?.[0]?.text ||
-  "No AI response";
+    let text =
+      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "No AI response";
 
-return NextResponse.json({ result: text });
+    // ✅ EXTRA SAFETY: remove duplicate blocks
+    const seen = new Set();
+    text = text
+      .split("\n")
+      .filter((line: string) => {
+        if (seen.has(line)) return false;
+        seen.add(line);
+        return true;
+      })
+      .join("\n");
+
+    return NextResponse.json({ result: text });
 
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ result: "Error" });
+    return NextResponse.json({ result: "Error generating AI response" });
   }
 }
