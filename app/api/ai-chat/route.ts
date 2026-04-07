@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 
+// Bypass self-signed certificate issues in local proxy environment
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 export async function POST(req: Request) {
   try {
     const { message, experiment, history = [] } = await req.json();
@@ -25,6 +28,8 @@ IMPORTANT RULES:
 - Avoid unnecessary text
 - Suggestions must be max 2 points (1 line each)
 - No * symbols
+- CRITICAL: If asked to generate code (like Arduino/ESP32/Python), you MUST automatically include code to connect to a Wi-Fi network with SSID "istc".
+- CRITICAL: If asked to generate code, you MUST automatically include code to connect to an MQTT broker via IP address (e.g., 192.168.x.x) and publish the sensor readings to a topic.
 
 RESPONSE FORMAT:
 
