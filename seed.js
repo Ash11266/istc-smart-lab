@@ -1,21 +1,20 @@
-import { createConnection } from 'mysql2/promise';
-import { v4 as uuidv4 } from 'uuid';
-import { config } from 'dotenv';
-import path from 'path';
-import fs from 'fs';
-import db from "@/lib/db";
+const { createConnection } = require('mysql2/promise');
+const { v4: uuidv4 } = require('uuid');
+const { config } = require('dotenv');
+const path = require('path');
+const fs = require('fs');
 
 // Load env vars
-// const envPath = path.resolve(process.cwd(), '.env');
-// const envLocalPath = path.resolve(process.cwd(), '.env.local');
+const envPath = path.resolve(process.cwd(), '.env');
+const envLocalPath = path.resolve(process.cwd(), '.env.local');
 
-// if (fs.existsSync(envLocalPath)) {
-//   config({ path: envLocalPath });
-// } else if (fs.existsSync(envPath)) {
-//   config({ path: envPath });
-// } else {
-//   console.log('No .env or .env.local file found.');
-// }
+if (fs.existsSync(envLocalPath)) {
+  config({ path: envLocalPath });
+} else if (fs.existsSync(envPath)) {
+  config({ path: envPath });
+} else {
+  console.log('No .env or .env.local file found.');
+}
 
 async function seed() {
   console.log('🌱 Starting database seeding...');
@@ -84,9 +83,21 @@ async function seed() {
       )
     `);
 
+    // Create users table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+
     // Clear existing data (optional, but good for a fresh seed)
     await connection.execute('TRUNCATE TABLE experiments');
-    console.log('🧹 Cleared existing experiments.');
+    await connection.execute('TRUNCATE TABLE users');
+    console.log('🧹 Cleared existing experiments and users.');
 
     // Insert seeds
     for (const exp of experiments) {
