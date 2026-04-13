@@ -123,6 +123,25 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
     setData([]); // clear old data
   }
 
+  const sendControlCommand = (device: string, action: "start" | "stop") => {
+    try {
+      const host = (process.env.NEXT_PUBLIC_WS_HOST || '').trim();
+      const port = (process.env.NEXT_PUBLIC_WS_PORT || '').trim();
+      const path = (process.env.NEXT_PUBLIC_WS_CONTROL_PATH || '').trim();
+      const wsControlUrl = `ws://${host}:${port}${path}`;
+      const ws = new WebSocket(wsControlUrl);
+      ws.onopen = () => {
+        ws.send(JSON.stringify({ device, action }));
+        ws.close();
+      };
+      ws.onerror = (err) => {
+        console.error("Control WebSocket error:", err);
+      };
+    } catch (err) {
+      console.error("Error creating control websocket:", err);
+    }
+  };
+
   function downloadCSV() {
     if (data.length === 0) return;
 
@@ -240,6 +259,33 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
         <div className="bg-slate-50 p-4 border border-slate-300 flex flex-col justify-center items-center text-center">
           <span className="text-xs uppercase tracking-widest text-slate-600 font-bold mb-1">Active Filter</span>
           <span className="text-lg font-bold text-[#003366] truncate w-full">{selectedDevice || "NO DEVICE SELECTED"}</span>
+        </div>
+      </div>
+
+      <div className="flex flex-col mt-2 gap-4">
+        <div className="bg-slate-50 p-4 border border-slate-300 flex flex-col justify-center items-center gap-3 text-center">
+          <span className="text-xl font-bold text-[#003366]">Control Tools</span>
+          
+          <div className="text-sm font-medium text-slate-600">
+            Target Device: <span className="font-bold text-slate-900">{selectedDevice || (data.length > 0 ? data[data.length - 1].device : "None")}</span>
+          </div>
+          
+          <div className="flex gap-3 mt-2">
+            <button
+              onClick={() => sendControlCommand(selectedDevice || (data.length > 0 ? data[data.length - 1].device : ""), "start")}
+              disabled={!selectedDevice && data.length === 0}
+              className={`px-8 py-2 text-white text-sm font-bold uppercase tracking-wider transition-colors shadow-sm ${(!selectedDevice && data.length === 0) ? "bg-slate-300 cursor-not-allowed" : "bg-emerald-600 hover:bg-emerald-700"}`}
+            >
+              Start
+            </button>
+            <button
+              onClick={() => sendControlCommand(selectedDevice || (data.length > 0 ? data[data.length - 1].device : ""), "stop")}
+              disabled={!selectedDevice && data.length === 0}
+              className={`px-8 py-2 text-white text-sm font-bold uppercase tracking-wider transition-colors shadow-sm ${(!selectedDevice && data.length === 0) ? "bg-slate-300 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"}`}
+            >
+              Stop
+            </button>
+          </div>
         </div>
       </div>
 
