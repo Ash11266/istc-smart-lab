@@ -5,10 +5,10 @@ import { RowDataPacket } from "mysql2/promise";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json();
+    const { name, contactNumber, email, password } = await req.json();
 
-    if (!email || !password) {
-      return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
+    if (!name || !contactNumber || !email || !password) {
+      return NextResponse.json({ error: "All fields are required" }, { status: 400 });
     }
 
     // Check if user already exists
@@ -26,8 +26,8 @@ export async function POST(req: NextRequest) {
 
     // Insert user
     await db.query(
-      "INSERT INTO users (email, password) VALUES (?, ?)",
-      [email, hashedPassword]
+      "INSERT INTO users (name, contact_number, email, password) VALUES (?, ?, ?, ?)",
+      [name, contactNumber, email, hashedPassword]
     );
 
     return NextResponse.json({ success: true, message: "User created successfully" }, { status: 201 });

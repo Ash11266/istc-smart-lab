@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function SignupPage() {
+  const [name, setName] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -20,7 +22,7 @@ export default function SignupPage() {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ name, contactNumber, email, password }),
       });
 
       if (res.ok) {
@@ -50,6 +52,30 @@ export default function SignupPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block text-[#003366] text-sm font-bold mb-1.5 uppercase tracking-wider">Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-300 rounded px-4 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003366]"
+              placeholder="Your Full Name"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-[#003366] text-sm font-bold mb-1.5 uppercase tracking-wider">Contact Number</label>
+            <input
+              type="tel"
+              value={contactNumber}
+              onChange={(e) => setContactNumber(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-300 rounded px-4 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003366]"
+              placeholder="+1234567890"
+              required
+            />
+          </div>
+
           <div>
             <label className="block text-[#003366] text-sm font-bold mb-1.5 uppercase tracking-wider">Email Address</label>
             <input
