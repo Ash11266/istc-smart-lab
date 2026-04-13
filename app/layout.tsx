@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Link from "next/link";
+import { cookies } from "next/headers";
+import LogoutButton from "./components/LogoutButton";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -10,11 +12,14 @@ export const metadata: Metadata = {
   description: "IoT and SQL powered system for managing and monitoring laboratory experiments.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const isLoggedIn = !!cookieStore.get("session");
+
   return (
     <html lang="en">
       <body className={`${inter.className} antialiased flex flex-col min-h-screen bg-slate-50`}>
@@ -48,9 +53,18 @@ export default function RootLayout({
                 <Link href="/experiments" className="text-sm font-semibold uppercase hover:underline underline-offset-4 tracking-wider">
                   Experiments
                 </Link>
-                <Link href="/experiments/create" className="text-sm font-semibold uppercase hover:underline underline-offset-4 tracking-wider bg-white text-[#003366] px-4 py-2 border-2 border-transparent hover:bg-slate-100 transition-colors">
-                  Create Experiment
-                </Link>
+                {isLoggedIn ? (
+                  <>
+                    <Link href="/experiments/create" className="text-sm font-semibold uppercase hover:underline underline-offset-4 tracking-wider bg-white text-[#003366] px-4 py-2 border-2 border-transparent hover:bg-slate-100 transition-colors">
+                      Create Experiment
+                    </Link>
+                    <LogoutButton />
+                  </>
+                ) : (
+                  <Link href="/login" className="text-sm font-semibold uppercase hover:underline underline-offset-4 tracking-wider bg-white text-[#003366] px-4 py-2 border-2 border-transparent hover:bg-slate-100 transition-colors">
+                    Login
+                  </Link>
+                )}
               </nav>
             </div>
           </div>

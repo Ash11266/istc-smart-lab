@@ -25,8 +25,8 @@ export default function CreateExperiment() {
         },
         body: JSON.stringify({ name, description, components, dataValues }),
       });
-
-      const data = await res.json();
+const data = await res.json();
+console.log("API RESPONSE:", data);
 
       if (data.success) {
         router.push("/experiments");

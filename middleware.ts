@@ -1,0 +1,38 @@
+import { NextRequest, NextResponse } from "next/server";
+import { decrypt } from "@/lib/auth";
+
+export async function middleware(req: NextRequest) {
+  const path = req.nextUrl.pathname;
+  
+  // Protect create page and non-GET APIs
+  const isProtectedRoute = path === '/experiments/create' || (path.startsWith('/api/experiments') && req.method !== 'GET');
+
+  if (isProtectedRoute) {
+    const cookie = req.cookies.get('session');
+    const token = cookie?.value;
+    
+    let isAuth = false;
+    if (token) {
+      const session = await decrypt(token);
+      if (session) isAuth = true;
+    }
+
+    if (!isAuth) {
+      // If it's an API route, return 401
+      if (path.startsWith('/api')) {
+         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+      // Otherwise, redirect to login
+      const url = new URL("/login", req.nextUrl);
+      // Optional: attach the return url to redirect back after login
+      url.searchParams.set("callbackUrl", path);
+      return NextResponse.redirect(url);
+    }
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+};
