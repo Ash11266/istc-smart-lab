@@ -25,6 +25,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
 
   const [deviceInput, setDeviceInput] = useState("");
   const [selectedDevice, setSelectedDevice] = useState("");
+  const [customCommand, setCustomCommand] = useState("");
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
@@ -123,7 +124,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
     setData([]); // clear old data
   }
 
-  const sendControlCommand = (device: string, action: "start" | "stop") => {
+  const sendControlCommand = (device: string, action: string) => {
     try {
       const host = (process.env.NEXT_PUBLIC_WS_HOST || '').trim();
       const port = (process.env.NEXT_PUBLIC_WS_PORT || '').trim();
@@ -270,7 +271,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
             Target Device: <span className="font-bold text-slate-900">{selectedDevice || (data.length > 0 ? data[data.length - 1].device : "None")}</span>
           </div>
           
-          <div className="flex gap-3 mt-2">
+          <div className="flex gap-3 mt-2 flex-wrap justify-center items-center">
             <button
               onClick={() => sendControlCommand(selectedDevice || (data.length > 0 ? data[data.length - 1].device : ""), "start")}
               disabled={!selectedDevice && data.length === 0}
@@ -285,6 +286,35 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
             >
               Stop
             </button>
+            
+            <div className="flex gap-2 border-l-2 border-slate-300 pl-3 ml-1 h-full">
+              <input
+                type="text"
+                value={customCommand}
+                onChange={(e) => setCustomCommand(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && customCommand.trim() && (selectedDevice || data.length > 0)) {
+                    sendControlCommand(selectedDevice || data[data.length - 1].device, customCommand.trim());
+                    setCustomCommand("");
+                  }
+                }}
+                placeholder="Custom command..."
+                className="px-3 py-2 border border-slate-400 bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#003366] w-56 shadow-sm"
+                disabled={!selectedDevice && data.length === 0}
+              />
+              <button
+                onClick={() => {
+                  if (customCommand.trim()) {
+                    sendControlCommand(selectedDevice || (data.length > 0 ? data[data.length - 1].device : ""), customCommand.trim());
+                    setCustomCommand("");
+                  }
+                }}
+                disabled={(!selectedDevice && data.length === 0) || !customCommand.trim()}
+                className={`px-6 py-2 text-white text-sm font-bold uppercase tracking-wider transition-colors shadow-sm ${(!selectedDevice && data.length === 0) || !customCommand.trim() ? "bg-slate-300 cursor-not-allowed" : "bg-[#003366] hover:bg-slate-900"}`}
+              >
+                Send
+              </button>
+            </div>
           </div>
         </div>
       </div>
