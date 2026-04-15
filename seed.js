@@ -33,14 +33,9 @@ async function seed() {
 
     console.log('✅ Connected to MySQL');
 
-    // Drop existing tables
-    await connection.execute('DROP TABLE IF EXISTS experiments');
-    await connection.execute('DROP TABLE IF EXISTS users');
-    console.log('🧹 Dropped existing experiments and users tables.');
-
     // Create table if not exists
     await connection.execute(`
-      CREATE TABLE experiments (
+      CREATE TABLE IF NOT EXISTS experiments (
         id INT AUTO_INCREMENT PRIMARY KEY,
         uuid VARCHAR(255) NOT NULL UNIQUE,
         name VARCHAR(255) NOT NULL,
@@ -53,56 +48,21 @@ async function seed() {
 
     // Create users table
     await connection.execute(`
-      CREATE TABLE users (
+      CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,
         email VARCHAR(255) NOT NULL UNIQUE,
-        name VARCHAR(255) NOT NULL,
-        contact_no VARCHAR(15) NOT NULL,
         password VARCHAR(255) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
-    // Insert seeds
-    const experiments = [
-      {
-        name: 'Alpha Node Sensor Diagnostic',
-        description: 'Testing latency and packet loss of the alpha node sensors under heavy load conditions.',
-        components: 'ESP32, DHT22, MPU6050',
-        dataValues: 'temperature, humidity, acceleration',
-      },
-      {
-        name: 'Thermal Camera Array Calibration',
-        description: 'Calibrating the thermal visualizer for the new smart lab monitoring dashboard to detect hotspot anomalies.',
-        components: 'Raspberry Pi 4, MLX90640, Active Cooling Unit',
-        dataValues: 'temperature, status',
-      },
-      {
-        name: 'Battery Discharge Kinetics',
-        description: 'Evaluating voltage drops on Li-Po batteries during sustained transmission intervals.',
-        components: 'INA219, Arduino Nano 33 BLE, 18650 Cells',
-        dataValues: 'voltage, current, power',
-      },
-      {
-        name: 'Automated Greenhouse Climate Control',
-        description: 'Regulating humidity and soil moisture for optimal plant growth in a controlled ecosystem.',
-        components: 'NodeMCU, Soil Moisture Sensor, Relay Module, Water Pump',
-        dataValues: 'humidity, soil_moisture, temperature',
-      },
-      {
-        name: 'Machine Learning Edge Inference',
-        description: 'Running a lightweight TensorFlow Lite model to classify acoustic anomalies in real-time.',
-        components: 'Jetson Nano, USB Microphone Array',
-        dataValues: 'noise_level, classification',
-      },
-      {
-        name: 'Distance Measurement',
-        description: 'Measuring Distance using an Ultrasonic Sensor and ESP8266',
-        components: 'Esp8266, Ultrasonic Sensor',
-        dataValues: 'distance',
-      }
-    ];
 
+    // Clear existing data (optional, but good for a fresh seed)
+    await connection.execute('TRUNCATE TABLE experiments');
+    await connection.execute('TRUNCATE TABLE users');
+    console.log('🧹 Cleared existing experiments and users.');
+
+    // Insert seeds
     for (const exp of experiments) {
       const uuid = uuidv4();
 
