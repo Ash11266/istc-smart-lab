@@ -5,6 +5,10 @@ import dynamic from "next/dynamic";
 import MetricStats from "./MetricStats";
 
 const MetricLineChart = dynamic(() => import("./MetricLineChart"), { ssr: false });
+const MetricDialChart = dynamic(() => import("./MetricDialChart"), { ssr: false });
+const MetricGaugeChart = dynamic(() => import("./MetricGaugeChart"), { ssr: false });
+
+
 
 type MqttMessage = {
   device: string;
@@ -26,6 +30,9 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
   const [deviceInput, setDeviceInput] = useState("");
   const [selectedDevice, setSelectedDevice] = useState("");
   const [customCommand, setCustomCommand] = useState("");
+
+  type ChartType = "line" | "gauge" | "dial";
+  const [chartTypes, setChartTypes] = useState<Record<string, ChartType>>({});
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
@@ -266,11 +273,11 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
       <div className="flex flex-col mt-2 gap-4">
         <div className="bg-slate-50 p-4 border border-slate-300 flex flex-col justify-center items-center gap-3 text-center">
           <span className="text-xl font-bold text-[#003366]">Control Tools</span>
-          
+
           <div className="text-sm font-medium text-slate-600">
             Target Device: <span className="font-bold text-slate-900">{selectedDevice || (data.length > 0 ? data[data.length - 1].device : "None")}</span>
           </div>
-          
+
           <div className="flex gap-3 mt-2 flex-wrap justify-center items-center">
             <button
               onClick={() => sendControlCommand(selectedDevice || (data.length > 0 ? data[data.length - 1].device : ""), "start")}
@@ -286,7 +293,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
             >
               Stop
             </button>
-            
+
             <div className="flex gap-2 border-l-2 border-slate-300 pl-3 ml-1 h-full">
               <input
                 type="text"
@@ -320,24 +327,66 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
       </div>
 
       {/* Metric Charts */}
+      {/* Metric Charts */}
       {metricsToDisplay.length > 0 && (
         <div className="flex flex-col gap-6 w-full mt-4 mb-2">
+
           {metricsToDisplay.map((metric) => {
-            const chartData = selectedDevice ? data.filter(d => d.metric && d.metric.toLowerCase() === metric.toLowerCase()) : [];
+            const chartData = selectedDevice
+              ? data.filter(d => d.metric && d.metric.toLowerCase() === metric.toLowerCase())
+              : [];
+
+            const currentChartType = chartTypes[metric] || "line";
+
             return (
               <div key={metric} className="flex flex-col xl:flex-row gap-4 w-full">
+
                 <div className="flex-1 border border-slate-300 bg-white shadow-sm p-4 min-w-0">
-                  <MetricLineChart
-                    metric={metric}
-                    data={chartData}
-                  />
+
+                  {/* 🔽 Per-metric dropdown */}
+                  <div className="flex items-center gap-2 mb-3">
+                    <label className="text-sm font-medium">Graph Type:</label>
+                    <select
+                      value={currentChartType}
+                      onChange={(e) => {
+                        const value = e.target.value as ChartType;
+
+                        setChartTypes(prev => ({
+                          ...prev,
+                          [metric]: value
+                        }));
+                      }}
+                      className="border border-slate-300 rounded px-2 py-1"
+                    >
+                      <option value="line">Line</option>
+                      <option value="gauge">Gauge</option>
+                      <option value="dial">Dial</option>
+                    </select>
+                  </div>
+
+                  {/* 📊 Conditional chart rendering */}
+                  {currentChartType === "line" && (
+                    <MetricLineChart metric={metric} data={chartData} />
+                  )}
+
+                  {currentChartType === "gauge" && (
+                    <MetricGaugeChart metric={metric} data={chartData} />
+                  )}
+
+                  {currentChartType === "dial" && (
+                    <MetricDialChart metric={metric} data={chartData} />
+                  )}
+
                 </div>
+
                 <div className="w-full xl:w-64 shrink-0 border border-slate-300 bg-white shadow-sm p-4 flex flex-col justify-center">
                   <MetricStats data={chartData} />
                 </div>
+
               </div>
             );
           })}
+
         </div>
       )}
 
