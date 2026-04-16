@@ -6,6 +6,7 @@ import Link from "next/link";
 export default function ExperimentsPage() {
   const [experiments, setExperiments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     fetch("/api/experiments")
@@ -13,8 +14,9 @@ export default function ExperimentsPage() {
       .then((data) => {
         if (Array.isArray(data)) {
           setExperiments(data);
-        } else if (Array.isArray(data.data)) {
+        } else if (data.data) {
           setExperiments(data.data);
+          setIsAdmin(!!data.isAdmin);
         } else {
           setExperiments([]);
         }
@@ -25,6 +27,22 @@ export default function ExperimentsPage() {
         setLoading(false);
       });
   }, []);
+
+  const handleDelete = async (e: React.MouseEvent, uuid: string) => {
+    e.preventDefault();
+    if (!confirm("Are you sure you want to delete this experiment?")) return;
+    
+    try {
+      const res = await fetch(`/api/experiments/${uuid}`, { method: "DELETE" });
+      if (res.ok) {
+        setExperiments(prev => prev.filter(exp => exp.uuid !== uuid));
+      } else {
+        alert("Failed to delete experiment");
+      }
+    } catch (err) {
+      alert("Error deleting experiment");
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto w-full flex flex-col gap-8 text-slate-900">
@@ -82,11 +100,24 @@ export default function ExperimentsPage() {
                       <div className="px-2 py-1 bg-slate-100 border border-slate-200 text-[#003366] font-bold font-mono text-xs uppercase tracking-widest">
                         ID: {exp.uuid ? exp.uuid.substring(0, 4) : "NEW"}
                       </div>
+                      
+                      {isAdmin && (
+                        <button 
+                          onClick={(e) => handleDelete(e, exp.uuid)} 
+                          className="px-2 py-1 bg-red-100 text-red-700 hover:bg-red-200 text-xs font-bold uppercase rounded border border-red-200 transition-colors z-10 relative"
+                        >
+                          Delete
+                        </button>
+                      )}
                     </div>
 
-                    <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:underline underline-offset-2 line-clamp-2">
+                    <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:underline underline-offset-2 line-clamp-2">
                       {exp.name}
                     </h3>
+
+                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">
+                        Created By: <span className="text-[#003366]">{exp.created_by_name || "System"}</span>
+                    </div>
 
                     <p className="text-slate-700 text-sm leading-relaxed mb-6 flex-1 line-clamp-3">
                       {exp.description || "No official description recorded."}
