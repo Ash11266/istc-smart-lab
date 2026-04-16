@@ -5,16 +5,9 @@ import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "ISTC Smart Lab",
-  description: "IoT and SQL powered system for managing and monitoring laboratory experiments.",
-};
-
-export default async function RootLayout({
+export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
 }>) {
   const cookieStore = await cookies();
@@ -87,31 +80,16 @@ export default async function RootLayout({
           </div>
         </header>
 
-        {/* Main Content Area */}
-        <main className="flex-1 w-full max-w-7xl mx-auto bg-white px-4 sm:px-6 lg:px-8 py-8 md:py-12 border-x border-b border-slate-200 shadow-sm">
+        {/* 🔷 MAIN */}
+        <main className="flex-1 relative overflow-hidden">
           {children}
         </main>
 
-        {/* Global Footer */}
-        <footer className="w-full bg-slate-800 mt-auto text-white">
-          <div className="container mx-auto px-4 py-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <span className="block text-xl font-bold mb-2">ISTC Smart Lab</span>
-                <p className="text-sm text-slate-300">
-                  IoT and SQL powered laboratory management platform.
-                </p>
-              </div>
-              <div className="md:text-right text-sm text-slate-400 flex flex-col justify-end">
-                <p>© {new Date().getFullYear()} CSIO Smart Lab</p>
-                <div className="mt-2 space-x-4">
-                  <a href="#" className="hover:text-white underline text-slate-300">Privacy Policy</a>
-                  <a href="#" className="hover:text-white underline text-slate-300">Accessibility</a>
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* 🔷 FOOTER */}
+        <footer className="w-full h-14 flex items-center justify-center bg-[#5dade2] border-t-[5px] border-orange-400 text-white text-sm tracking-wide">
+          Research Laboratory Interface
         </footer>
+
       </body>
     </html>
   );
