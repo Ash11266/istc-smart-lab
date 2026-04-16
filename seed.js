@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 const { config } = require('dotenv');
 const path = require('path');
 const fs = require('fs');
+const bcrypt = require('bcryptjs');
 
 // Load env vars
 const envPath = path.resolve(process.cwd(), '.env');
@@ -57,8 +58,8 @@ async function seed() {
         id INT AUTO_INCREMENT PRIMARY KEY,
         email VARCHAR(255) NOT NULL UNIQUE,
         name VARCHAR(255) NOT NULL,
-        contact_no VARCHAR(15) NOT NULL,
         password VARCHAR(255) NOT NULL,
+        is_admin BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
@@ -114,6 +115,15 @@ async function seed() {
 
       console.log(`✅ Inserted: ${exp.name}`);
     }
+
+    // Insert Admin User
+    const adminPassword = await bcrypt.hash('admin123', 10);
+    await connection.execute(
+        `INSERT INTO users (email, name, password, is_admin)
+         VALUES (?, ?, ?, ?)`,
+        ['admin@smartlab.com', 'Admin User', adminPassword, true]
+    );
+    console.log(`✅ Default admin user created (admin@smartlab.com / admin123)`);
 
     console.log('🎉 Seeding completed successfully!');
   } catch (error) {
