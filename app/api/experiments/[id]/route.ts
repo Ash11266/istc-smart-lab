@@ -3,14 +3,20 @@ import db from "@/lib/db";
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ id: string }> } // 👈 params is Promise now
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params; // 👈 MUST await
+    const { id } = await params;
+
+    // Convert slug → keyword
+    const keyword = id.replace(/-/g, " ");
 
     const [rows]: any = await db.query(
-      "SELECT uuid, name, description, components, dataValues FROM experiments WHERE uuid = ?",
-      [id]
+      `SELECT uuid, name, description, components, dataValues
+       FROM experiments
+       WHERE uuid = ?
+       OR LOWER(name) LIKE LOWER(?)`,
+      [id, `%${keyword}%`]
     );
 
     if (rows.length === 0) {
