@@ -40,9 +40,9 @@ export default function AIBox({
   };
 
   return (
-    <div className="mt-6">
+    <div className="bg-white border p-6 flex flex-col h-full shrink-0">
       {/* Title */}
-      <h2 className="text-xl font-bold mb-3 text-[#003366]">
+      <h2 className="text-xl font-bold mb-4 text-[#003366]">
       Experiment Insights
       </h2>
 
@@ -51,10 +51,10 @@ export default function AIBox({
   <button
     onClick={handleAI}
     disabled={loading}
-    className={`flex items-center gap-2 px-5 py-2 font-semibold text-white rounded transition
+    className={`flex items-center justify-center gap-2 w-full px-5 py-3 font-semibold text-white transition tracking-wide uppercase text-sm
       ${loading 
         ? "bg-slate-400 cursor-not-allowed" 
-        : "bg-[#003366] hover:bg-slate-900"}
+        : "bg-[#003366] hover:bg-[#002244]"}
     `}
   >
     {loading ? (
@@ -74,8 +74,8 @@ export default function AIBox({
 
       {/* Output */}
       {aiText && (
-        <div className="mt-4 p-4 bg-slate-100 border border-slate-300 rounded shadow-sm">
-          <p className="whitespace-pre-line text-slate-800">{aiText}</p>
+        <div className="mt-4 p-4 bg-slate-50 border border-slate-200 shadow-sm flex-1 overflow-y-auto">
+          <p className="whitespace-pre-line text-slate-800 leading-relaxed max-w-prose">{aiText}</p>
         </div>
       )}
     </div>

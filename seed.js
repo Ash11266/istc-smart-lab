@@ -1,9 +1,20 @@
-import { createConnection } from 'mysql2/promise';
-import { v4 as uuidv4 } from 'uuid';
-import { config } from 'dotenv';
+const { createConnection } = require('mysql2/promise');
+const { v4: uuidv4 } = require('uuid');
+const { config } = require('dotenv');
+const path = require('path');
+const fs = require('fs');
 
-// Load environment variables
-config({ path: '.env.local' });
+// Load env vars
+const envPath = path.resolve(process.cwd(), '.env');
+const envLocalPath = path.resolve(process.cwd(), '.env.local');
+
+if (fs.existsSync(envLocalPath)) {
+  config({ path: envLocalPath });
+} else if (fs.existsSync(envPath)) {
+  config({ path: envPath });
+} else {
+  console.log('No .env or .env.local file found.');
+}
 
 async function seed() {
   console.log('🌱 Starting database seeding...');
@@ -22,9 +33,14 @@ async function seed() {
 
     console.log('✅ Connected to MySQL');
 
+    // Drop existing tables
+    await connection.execute('DROP TABLE IF EXISTS experiments');
+    await connection.execute('DROP TABLE IF EXISTS users');
+    console.log('🧹 Dropped existing experiments and users tables.');
+
     // Create table if not exists
     await connection.execute(`
-      CREATE TABLE IF NOT EXISTS experiments (
+      CREATE TABLE experiments (
         id INT AUTO_INCREMENT PRIMARY KEY,
         uuid VARCHAR(255) NOT NULL UNIQUE,
         name VARCHAR(255) NOT NULL,
@@ -35,53 +51,58 @@ async function seed() {
       )
     `);
 
-    console.log('📦 Table ready');
+    // Create users table
+    await connection.execute(`
+      CREATE TABLE users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        name VARCHAR(255) NOT NULL,
+        contact_no VARCHAR(15) NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
 
-    // Clear old data
-    await connection.execute('TRUNCATE TABLE experiments');
-    console.log('🧹 Old data cleared');
-
-    // Seed data
+    // Insert seeds
     const experiments = [
       {
         name: 'Alpha Node Sensor Diagnostic',
-        description: 'Testing latency and packet loss under heavy load.',
+        description: 'Testing latency and packet loss of the alpha node sensors under heavy load conditions.',
         components: 'ESP32, DHT22, MPU6050',
         dataValues: 'temperature, humidity, acceleration',
       },
       {
-        name: 'Thermal Camera Calibration',
-        description: 'Detect hotspot anomalies using thermal sensors.',
-        components: 'Raspberry Pi 4, MLX90640',
+        name: 'Thermal Camera Array Calibration',
+        description: 'Calibrating the thermal visualizer for the new smart lab monitoring dashboard to detect hotspot anomalies.',
+        components: 'Raspberry Pi 4, MLX90640, Active Cooling Unit',
         dataValues: 'temperature, status',
       },
       {
-        name: 'Battery Discharge Test',
-        description: 'Analyze Li-Po battery voltage drop.',
-        components: 'INA219, Arduino Nano',
+        name: 'Battery Discharge Kinetics',
+        description: 'Evaluating voltage drops on Li-Po batteries during sustained transmission intervals.',
+        components: 'INA219, Arduino Nano 33 BLE, 18650 Cells',
         dataValues: 'voltage, current, power',
       },
       {
-        name: 'Smart Greenhouse',
-        description: 'Automated humidity & soil moisture control.',
-        components: 'NodeMCU, Soil Sensor, Relay',
+        name: 'Automated Greenhouse Climate Control',
+        description: 'Regulating humidity and soil moisture for optimal plant growth in a controlled ecosystem.',
+        components: 'NodeMCU, Soil Moisture Sensor, Relay Module, Water Pump',
         dataValues: 'humidity, soil_moisture, temperature',
       },
       {
-        name: 'ML Edge Inference',
-        description: 'Detect sound anomalies using ML model.',
-        components: 'Jetson Nano, Microphone',
+        name: 'Machine Learning Edge Inference',
+        description: 'Running a lightweight TensorFlow Lite model to classify acoustic anomalies in real-time.',
+        components: 'Jetson Nano, USB Microphone Array',
         dataValues: 'noise_level, classification',
       },
       {
         name: 'Distance Measurement',
-        description: 'Measure distance using ultrasonic sensor.',
-        components: 'ESP8266, Ultrasonic Sensor',
+        description: 'Measuring Distance using an Ultrasonic Sensor and ESP8266',
+        components: 'Esp8266, Ultrasonic Sensor',
         dataValues: 'distance',
       }
     ];
 
-    // Insert data
     for (const exp of experiments) {
       const uuid = uuidv4();
 
