@@ -7,7 +7,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="w-full bg-slate-50 border-b border-slate-200">
         <div className="max-w-5xl mx-auto px-4 py-16 md:py-24 flex flex-col items-start text-left">
-          
+
           <div className="inline-block px-3 py-1 bg-amber-100 text-amber-900 text-sm font-bold mb-6 border-l-4 border-amber-500 uppercase tracking-widest">
             ISTC Smart Lab Platform
           </div>
@@ -22,7 +22,7 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-start w-full">
             <Link href="/experiments" className="w-full sm:w-auto px-8 py-3 bg-[#003366] text-white font-bold text-center border-2 border-[#003366] hover:bg-slate-900 hover:border-slate-900 transition-colors uppercase tracking-wider text-sm shadow-sm">
-              View Access Experiments
+              View Experiments
             </Link>
           </div>
         </div>
@@ -35,7 +35,7 @@ export default function Home() {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          
+
           {/* Card 1 */}
           <div className="bg-white p-8 border border-slate-300 shadow-sm hover:bg-slate-50 transition-colors">
             <div className="w-12 h-12 bg-slate-100 text-[#003366] flex items-center justify-center mb-6 border border-slate-200">
