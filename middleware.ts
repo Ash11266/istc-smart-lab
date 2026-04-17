@@ -9,7 +9,13 @@ export async function middleware(req: NextRequest) {
 
   if (isProtectedRoute) {
     const cookie = req.cookies.get('session');
-    const token = cookie?.value;
+    let token = cookie?.value;
+    
+    // Check Authorization header for mobile app fallback
+    const authHeader = req.headers.get('authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    }
     
     let isAuth = false;
     if (token) {
