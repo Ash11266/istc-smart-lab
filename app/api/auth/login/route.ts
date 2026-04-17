@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
 
     // Find user
     const [users] = await db.query<RowDataPacket[]>(
-      "SELECT id, email, password FROM users WHERE email = ?",
+      "SELECT id, email, password, is_admin FROM users WHERE email = ?",
       [email]
     );
 
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create session token
-    const token = await encrypt({ userId: user.id, email: user.email });
+    const token = await encrypt({ userId: user.id, email: user.email, isAdmin: !!user.is_admin });
 
     // Set cookie
     const response = NextResponse.json({ success: true }, { status: 200 });

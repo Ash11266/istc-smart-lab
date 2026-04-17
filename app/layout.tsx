@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Link from "next/link";
 import { cookies } from "next/headers";
-import LogoutButton from "./components/LogoutButton";
+import { decrypt } from "@/lib/auth";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -18,7 +18,17 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const cookieStore = await cookies();
-  const isLoggedIn = !!cookieStore.get("session");
+  const token = cookieStore.get("session")?.value;
+  let isLoggedIn = false;
+  let isAdmin = false;
+
+  if (token) {
+    const session = await decrypt(token);
+    if (session) {
+      isLoggedIn = true;
+      isAdmin = !!session.isAdmin;
+    }
+  }
 
   return (
     <html lang="en">
@@ -55,10 +65,17 @@ export default async function RootLayout({
                 </Link>
                 {isLoggedIn ? (
                   <>
+                    {isAdmin && (
+                      <Link href="/admin" className="text-sm font-semibold uppercase hover:underline underline-offset-4 tracking-wider bg-amber-500 text-white px-4 py-2 border-2 border-transparent hover:bg-amber-600 transition-colors">
+                        Admin Panel
+                      </Link>
+                    )}
                     <Link href="/experiments/create" className="text-sm font-semibold uppercase hover:underline underline-offset-4 tracking-wider bg-white text-[#003366] px-4 py-2 border-2 border-transparent hover:bg-slate-100 transition-colors">
                       Create Experiment
                     </Link>
-                    <LogoutButton />
+                    <Link href="/profile" className="text-sm font-semibold uppercase hover:underline underline-offset-4 tracking-wider text-white">
+                      Profile
+                    </Link>
                   </>
                 ) : (
                   <Link href="/login" className="text-sm font-semibold uppercase hover:underline underline-offset-4 tracking-wider bg-white text-[#003366] px-4 py-2 border-2 border-transparent hover:bg-slate-100 transition-colors">
