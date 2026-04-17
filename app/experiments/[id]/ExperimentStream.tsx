@@ -1,7 +1,17 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo } from "react";
-import MetricLineChart from "./MetricLineChart";
+import dynamic from "next/dynamic";
+import MetricStats from "./MetricStats";
+
+const MetricLineChart = dynamic(() => import("./MetricLineChart"), { ssr: false });
+const MetricDialChart = dynamic(() => import("./MetricDialChart"), { ssr: false });
+const MetricGaugeChart = dynamic(() => import("./MetricGaugeChart"), { ssr: false });
+const MetricBarChart = dynamic(() => import("./MetricBarChart"), { ssr: false });
+const MetricAreaChart = dynamic(() => import("./MetricAreaChart"), { ssr: false });
+const MetricScatterChart = dynamic(() => import("./MetricScatterChart"), { ssr: false });
+
+
 
 type MqttMessage = {
   device: string;
@@ -24,7 +34,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
   const [selectedDevice, setSelectedDevice] = useState("");
   const [customCommand, setCustomCommand] = useState("");
 
-  type ChartType = "line" | "gauge" | "dial";
+  type ChartType = "line" | "gauge" | "dial" | "bar" | "area" | "scatter";
   const [chartTypes, setChartTypes] = useState<Record<string, ChartType>>({});
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -322,15 +332,78 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
       {/* Metric Charts */}
       {/* Metric Charts */}
       {metricsToDisplay.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full mt-4 mb-2">
-          {metricsToDisplay.map((metric) => (
-            <div key={metric} className="border border-slate-300 bg-white shadow-sm p-4">
-              <MetricLineChart
-                metric={metric}
-                data={selectedDevice ? data.filter(d => d.metric && d.metric.toLowerCase() === metric.toLowerCase()) : []}
-              />
-            </div>
-          ))}
+        <div className="flex flex-col gap-6 w-full mt-4 mb-2">
+
+          {metricsToDisplay.map((metric) => {
+            const chartData = selectedDevice
+              ? data.filter(d => d.metric && d.metric.toLowerCase() === metric.toLowerCase())
+              : [];
+
+            const currentChartType = chartTypes[metric] || "line";
+
+            return (
+              <div key={metric} className="flex flex-col xl:flex-row gap-4 w-full">
+
+                <div className="flex-1 border border-slate-300 bg-white shadow-sm p-4 min-w-0">
+
+                  {/* 🔽 Per-metric dropdown */}
+                  <div className="flex items-center gap-2 mb-3">
+                    <label className="text-sm font-medium">Graph Type:</label>
+                    <select
+                      value={currentChartType}
+                      onChange={(e) => {
+                        const value = e.target.value as ChartType;
+
+                        setChartTypes(prev => ({
+                          ...prev,
+                          [metric]: value
+                        }));
+                      }}
+                      className="border border-slate-300 rounded px-2 py-1"
+                    >
+                      <option value="line">Line</option>
+                      <option value="gauge">Gauge</option>
+                      <option value="dial">Dial</option>
+                      <option value="bar">Bar</option>
+                      <option value="area">Area</option>
+                      <option value="scatter">Scatter</option>
+                    </select>
+                  </div>
+
+                  {currentChartType === "line" && (
+                    <MetricLineChart metric={metric} data={chartData} />
+                  )}
+
+                  {currentChartType === "gauge" && (
+                    <MetricGaugeChart metric={metric} data={chartData} />
+                  )}
+
+                  {currentChartType === "dial" && (
+                    <MetricDialChart metric={metric} data={chartData} />
+                  )}
+
+                  {currentChartType === "bar" && (
+                    <MetricBarChart metric={metric} data={chartData} />
+                  )}
+
+                  {currentChartType === "area" && (
+                    <MetricAreaChart metric={metric} data={chartData} />
+                  )}
+
+                  {currentChartType === "scatter" && (
+                    <MetricScatterChart metric={metric} data={chartData} />
+                  )}
+
+                </div>
+
+                <div className="w-full xl:w-64 shrink-0 border border-slate-300 bg-white shadow-sm p-4 flex flex-col justify-center">
+                  <MetricStats data={chartData} />
+                </div>
+
+              </div>
+            );
+          })}
+
         </div>
       )}
 
