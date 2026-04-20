@@ -7,7 +7,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="h-screen overflow-hidden flex flex-col bg-[#e6edf3] text-black">
+      <body className="min-h-screen flex flex-col bg-[#e6edf3] text-black">
 
         {/* 🔷 HEADER */}
         <header className="w-full h-24 flex items-center justify-center relative bg-[#5dade2] border-b-[5px] border-orange-400 shadow-md">
@@ -26,8 +26,8 @@ export default function RootLayout({
 
         </header>
 
-        {/* 🔷 MAIN */}
-        <main className="flex-1 relative overflow-hidden">
+        {/* 🔷 MAIN (SCROLL ENABLED) */}
+        <main className="flex-1 overflow-y-auto">
           {children}
         </main>
 
