@@ -4,17 +4,29 @@ import { decrypt } from "@/lib/auth";
 export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
   
-  // Protect create page and non-GET APIs
-  const isProtectedRoute = path === '/experiments/create' || (path.startsWith('/api/experiments') && req.method !== 'GET');
+  // Protect create page, admin panel, profile, and non-GET APIs
+  const isProtectedRoute = path === '/experiments/create' || path === '/profile' || path.startsWith('/admin') || (path.startsWith('/api/experiments') && req.method !== 'GET');
 
   if (isProtectedRoute) {
     const cookie = req.cookies.get('session');
-    const token = cookie?.value;
+    let token = cookie?.value;
+    
+    // Check Authorization header for mobile app fallback
+    const authHeader = req.headers.get('authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    }
     
     let isAuth = false;
     if (token) {
       const session = await decrypt(token);
-      if (session) isAuth = true;
+      if (session) {
+        isAuth = true;
+
+        if (path.startsWith('/admin') && !session.isAdmin) {
+          return NextResponse.redirect(new URL("/", req.nextUrl));
+        }
+      }
     }
 
     if (!isAuth) {

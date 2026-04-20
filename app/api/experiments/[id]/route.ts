@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import db from "@/lib/db";
+import { decrypt } from "@/lib/auth";
 
 export async function GET(
   req: Request,
@@ -32,8 +33,35 @@ export async function GET(
     console.error("Database error:", error);
 
     return NextResponse.json(
-      { message: "Database error" },
       { status: 500 }
     );
+  }
+}
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const cookie = req.cookies.get("session")?.value;
+    let isAdmin = false;
+
+    if (cookie) {
+      const session = await decrypt(cookie);
+      if (session?.isAdmin) isAdmin = true;
+    }
+
+    if (!isAdmin) {
+      return NextResponse.json({ error: "Forbidden: Admins only" }, { status: 403 });
+    }
+
+    const { id } = await params;
+    
+    await db.query("DELETE FROM experiments WHERE uuid = ?", [id]);
+
+    return NextResponse.json({ success: true, message: "Experiment deleted" }, { status: 200 });
+  } catch (error) {
+    console.error("Experiment delete error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

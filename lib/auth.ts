@@ -3,6 +3,7 @@ import { jwtVerify, SignJWT } from "jose";
 export interface SessionPayload {
   userId: number;
   email: string;
+  isAdmin?: boolean;
 }
 
 const secretKey = process.env.SESSION_SECRET || "default_super_secret_key_123!";

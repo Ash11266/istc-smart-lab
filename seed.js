@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 const { config } = require('dotenv');
 const path = require('path');
 const fs = require('fs');
+const bcrypt = require('bcryptjs');
 
 // Load env vars
 const envPath = path.resolve(process.cwd(), '.env');
@@ -47,6 +48,7 @@ async function seed() {
         description TEXT,
         components VARCHAR(500),
         dataValues VARCHAR(500),
+        created_by INT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
@@ -57,13 +59,23 @@ async function seed() {
         id INT AUTO_INCREMENT PRIMARY KEY,
         email VARCHAR(255) NOT NULL UNIQUE,
         name VARCHAR(255) NOT NULL,
-        contact_no VARCHAR(15) NOT NULL,
         password VARCHAR(255) NOT NULL,
+        is_admin BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
-    // Insert seeds
+    // Insert Admin User first to get its ID
+    const adminPassword = await bcrypt.hash('admin123', 10);
+    const [adminRow] = await connection.execute(
+        `INSERT INTO users (email, name, password, is_admin)
+         VALUES (?, ?, ?, ?)`,
+        ['admin@smartlab.com', 'Admin User', adminPassword, true]
+    );
+    const adminId = adminRow.insertId;
+    console.log(`✅ Default admin user created (admin@smartlab.com / admin123) with ID ${adminId}`);
+
+    // Insert experiments seeds
     const experiments = [
       {
         name: 'Alpha Node Sensor Diagnostic',
@@ -107,9 +119,9 @@ async function seed() {
       const uuid = uuidv4();
 
       await connection.execute(
-        `INSERT INTO experiments (uuid, name, description, components, dataValues)
-         VALUES (?, ?, ?, ?, ?)`,
-        [uuid, exp.name, exp.description, exp.components, exp.dataValues]
+        `INSERT INTO experiments (uuid, name, description, components, dataValues, created_by)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [uuid, exp.name, exp.description, exp.components, exp.dataValues, adminId]
       );
 
       console.log(`✅ Inserted: ${exp.name}`);

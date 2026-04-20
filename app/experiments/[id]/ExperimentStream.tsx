@@ -7,6 +7,9 @@ import MetricStats from "./MetricStats";
 const MetricLineChart = dynamic(() => import("./MetricLineChart"), { ssr: false });
 const MetricDialChart = dynamic(() => import("./MetricDialChart"), { ssr: false });
 const MetricGaugeChart = dynamic(() => import("./MetricGaugeChart"), { ssr: false });
+const MetricBarChart = dynamic(() => import("./MetricBarChart"), { ssr: false });
+const MetricAreaChart = dynamic(() => import("./MetricAreaChart"), { ssr: false });
+const MetricScatterChart = dynamic(() => import("./MetricScatterChart"), { ssr: false });
 
 
 
@@ -31,7 +34,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
   const [selectedDevice, setSelectedDevice] = useState("");
   const [customCommand, setCustomCommand] = useState("");
 
-  type ChartType = "line" | "gauge" | "dial";
+  type ChartType = "line" | "gauge" | "dial" | "bar" | "area" | "scatter";
   const [chartTypes, setChartTypes] = useState<Record<string, ChartType>>({});
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -361,10 +364,12 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
                       <option value="line">Line</option>
                       <option value="gauge">Gauge</option>
                       <option value="dial">Dial</option>
+                      <option value="bar">Bar</option>
+                      <option value="area">Area</option>
+                      <option value="scatter">Scatter</option>
                     </select>
                   </div>
 
-                  {/* 📊 Conditional chart rendering */}
                   {currentChartType === "line" && (
                     <MetricLineChart metric={metric} data={chartData} />
                   )}
@@ -375,6 +380,18 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
 
                   {currentChartType === "dial" && (
                     <MetricDialChart metric={metric} data={chartData} />
+                  )}
+
+                  {currentChartType === "bar" && (
+                    <MetricBarChart metric={metric} data={chartData} />
+                  )}
+
+                  {currentChartType === "area" && (
+                    <MetricAreaChart metric={metric} data={chartData} />
+                  )}
+
+                  {currentChartType === "scatter" && (
+                    <MetricScatterChart metric={metric} data={chartData} />
                   )}
 
                 </div>
