@@ -1,6 +1,8 @@
 import Link from "next/link";
 import ExperimentStream from "./ExperimentStream";
 import AIChat from "@/components/AIChat";
+import AIUpload from "./AIUpload";          // ✅ added
+import MLPrediction from "./MLPrediction";  // ✅ added
 
 export default async function ExperimentPage({
   params,
@@ -36,17 +38,15 @@ export default async function ExperimentPage({
   }
 
   return (
-    <div className="flex h-full">
+    <div className="flex min-h-screen"> {/* ✅ fixed height */}
 
       {/* 🔷 LEFT SIDEBAR */}
       <div className="w-1/4 bg-[#d6eaf8] border-r-4 border-orange-400 p-4 flex flex-col">
-
         <h2 className="text-xl font-semibold mb-4 text-[#154360]">
           Experiments
         </h2>
 
         <div className="flex-1 overflow-y-auto space-y-2">
-
           {[
             "alpha-node",
             "thermal-camera",
@@ -69,14 +69,11 @@ export default async function ExperimentPage({
               </p>
             </Link>
           ))}
-
         </div>
-
       </div>
 
       {/* 🔷 RIGHT CONTENT */}
-      <div className="flex-1 max-w-6xl mx-auto w-full py-8 px-6 text-slate-900 bg-[#f4f9fd]">
-
+      <div className="flex-1 max-w-6xl mx-auto w-full py-8 px-6 pb-32 text-slate-900 bg-[#f4f9fd] overflow-y-auto">
         {/* HEADER */}
         <div className="mb-6 border-b-2 border-slate-300 pb-4">
           <Link
@@ -93,7 +90,6 @@ export default async function ExperimentPage({
 
         {/* INFO */}
         <div className="grid md:grid-cols-2 gap-8">
-
           <div className="bg-white border p-6 rounded-lg shadow-sm">
             <h2 className="text-xl font-bold mb-4">Overview</h2>
             <p>{experiment.description || "No description"}</p>
@@ -103,7 +99,6 @@ export default async function ExperimentPage({
             <h2 className="text-xl font-bold mb-4">Components</h2>
             <p>{experiment.components || "None"}</p>
           </div>
-
         </div>
 
         {/* LIVE DATA */}
@@ -112,7 +107,7 @@ export default async function ExperimentPage({
           <ExperimentStream dataValues={experiment.dataValues} />
         </div>
 
-        {/* AI SECTION */}
+        {/* AI CHAT */}
         <div className="mt-6">
           <AIChat
             description={experiment.description}
@@ -121,8 +116,13 @@ export default async function ExperimentPage({
           />
         </div>
 
-      </div>
+        {/* 🔥 AI FILE ANALYSIS */}
+        <AIUpload />
 
+        {/* 🔥 ML PREDICTION */}
+        <MLPrediction />
+
+      </div>
     </div>
   );
 }

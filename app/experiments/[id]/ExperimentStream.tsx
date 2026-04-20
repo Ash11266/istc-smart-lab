@@ -20,9 +20,6 @@ type MqttMessage = {
 
 export default function ExperimentStream({ dataValues }: { dataValues?: string }) {
 
-  // 🔥 TEMP AUTH BYPASS
-  const isAuthenticated = true;
-
   const allowedMetrics = dataValues
     ? dataValues.split(",").map(v => v.trim().toLowerCase()).filter(Boolean)
     : [];
@@ -33,7 +30,6 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
 
   const [deviceInput, setDeviceInput] = useState("");
   const [selectedDevice, setSelectedDevice] = useState("");
-  const [customCommand, setCustomCommand] = useState("");
 
   type ChartType = "line" | "gauge" | "dial" | "bar" | "area" | "scatter";
   const [chartTypes, setChartTypes] = useState<Record<string, ChartType>>({});
@@ -57,9 +53,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
       `ws://${process.env.NEXT_PUBLIC_WS_HOST}:${process.env.NEXT_PUBLIC_WS_PORT}${process.env.NEXT_PUBLIC_WS_PATH}`
     );
 
-    ws.onopen = () => {
-      setConnected(true);
-    };
+    ws.onopen = () => setConnected(true);
 
     ws.onmessage = (event) => {
       try {
@@ -74,9 +68,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
 
         const currentDevice = selectedDeviceRef.current;
 
-        if (allowedMetrics.length > 0 && message.metric && !allowedMetrics.includes(message.metric.toLowerCase())) {
-          return;
-        }
+        if (allowedMetrics.length > 0 && message.metric && !allowedMetrics.includes(message.metric.toLowerCase())) return;
 
         if (!currentDevice || message.device === currentDevice) {
           setData((prev) => [...prev.slice(-199), message]);
@@ -88,7 +80,6 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
     };
 
     ws.onclose = () => setConnected(false);
-
     setSocket(ws);
   }
 
@@ -101,17 +92,6 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
     setSelectedDevice(deviceInput.trim());
     setData([]);
   }
-
-  const sendControlCommand = (device: string, action: string) => {
-    const ws = new WebSocket(
-      `ws://${process.env.NEXT_PUBLIC_WS_HOST}:${process.env.NEXT_PUBLIC_WS_PORT}${process.env.NEXT_PUBLIC_WS_CONTROL_PATH}`
-    );
-
-    ws.onopen = () => {
-      ws.send(JSON.stringify({ device, action }));
-      ws.close();
-    };
-  };
 
   function downloadCSV() {
     if (data.length === 0) return;
@@ -131,53 +111,26 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
   return (
     <div className="flex flex-col gap-6 w-full text-slate-900">
 
-      {/* 🔷 CONTROLS */}
+      {/* CONTROLS */}
       <div className="flex gap-3 flex-wrap">
-
-        <button
-          onClick={downloadCSV}
-          className="px-4 py-2 border bg-white text-[#003366]"
-        >
-          Export CSV
-        </button>
-
-        <button
-          onClick={connect}
-          className="px-4 py-2 bg-[#003366] text-white"
-        >
-          Connect
-        </button>
-
-        <button
-          onClick={disconnect}
-          className="px-4 py-2 bg-red-600 text-white"
-        >
-          Disconnect
-        </button>
-
+        <button onClick={downloadCSV} className="px-4 py-2 border bg-white text-[#003366]">Export CSV</button>
+        <button onClick={connect} className="px-4 py-2 bg-[#003366] text-white">Connect</button>
+        <button onClick={disconnect} className="px-4 py-2 bg-red-600 text-white">Disconnect</button>
       </div>
 
-      {/* 🔷 FILTER */}
+      {/* FILTER */}
       <div className="flex gap-2">
-        <input
-          value={deviceInput}
-          onChange={(e) => setDeviceInput(e.target.value)}
-          placeholder="Device filter"
-          className="border p-2"
-        />
-        <button onClick={applyDeviceFilter} className="bg-[#003366] text-white px-4">
-          Apply
-        </button>
+        <input value={deviceInput} onChange={(e) => setDeviceInput(e.target.value)} placeholder="Device filter" className="border p-2" />
+        <button onClick={applyDeviceFilter} className="bg-[#003366] text-white px-4">Apply</button>
       </div>
 
-      {/* 🔷 METRIC CHARTS */}
+      {/* METRIC CHARTS */}
       {metricsToDisplay.map((metric) => {
         const chartData = data.filter(d => d.metric === metric);
         const type = chartTypes[metric] || "line";
 
         return (
           <div key={metric} className="flex gap-4">
-
             <div className="flex-1 bg-white p-4 border">
 
               <select
@@ -191,23 +144,28 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
                 <option value="line">Line</option>
                 <option value="gauge">Gauge</option>
                 <option value="dial">Dial</option>
+                <option value="bar">Bar</option>
+                <option value="area">Area</option>
+                <option value="scatter">Scatter</option>
               </select>
 
               {type === "line" && <MetricLineChart metric={metric} data={chartData} />}
               {type === "gauge" && <MetricGaugeChart metric={metric} data={chartData} />}
               {type === "dial" && <MetricDialChart metric={metric} data={chartData} />}
+              {type === "bar" && <MetricBarChart metric={metric} data={chartData} />}
+              {type === "area" && <MetricAreaChart metric={metric} data={chartData} />}
+              {type === "scatter" && <MetricScatterChart metric={metric} data={chartData} />}
 
             </div>
 
             <div className="w-64 bg-white p-4 border">
               <MetricStats data={chartData} />
             </div>
-
           </div>
         );
       })}
 
-      {/* 🔷 TERMINAL */}
+      {/* TERMINAL */}
       <div className="bg-black text-white p-4 h-60 overflow-y-auto">
         {data.map((d, i) => (
           <div key={i}>
@@ -216,123 +174,6 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
         ))}
       </div>
 
-<<<<<<< HEAD
-      {/* Metric Charts */}
-      {/* Metric Charts */}
-      {metricsToDisplay.length > 0 && (
-        <div className="flex flex-col gap-6 w-full mt-4 mb-2">
-
-          {metricsToDisplay.map((metric) => {
-            const chartData = selectedDevice
-              ? data.filter(d => d.metric && d.metric.toLowerCase() === metric.toLowerCase())
-              : [];
-
-            const currentChartType = chartTypes[metric] || "line";
-
-            return (
-              <div key={metric} className="flex flex-col xl:flex-row gap-4 w-full">
-
-                <div className="flex-1 border border-slate-300 bg-white shadow-sm p-4 min-w-0">
-
-                  {/* 🔽 Per-metric dropdown */}
-                  <div className="flex items-center gap-2 mb-3">
-                    <label className="text-sm font-medium">Graph Type:</label>
-                    <select
-                      value={currentChartType}
-                      onChange={(e) => {
-                        const value = e.target.value as ChartType;
-
-                        setChartTypes(prev => ({
-                          ...prev,
-                          [metric]: value
-                        }));
-                      }}
-                      className="border border-slate-300 rounded px-2 py-1"
-                    >
-                      <option value="line">Line</option>
-                      <option value="gauge">Gauge</option>
-                      <option value="dial">Dial</option>
-                      <option value="bar">Bar</option>
-                      <option value="area">Area</option>
-                      <option value="scatter">Scatter</option>
-                    </select>
-                  </div>
-
-                  {currentChartType === "line" && (
-                    <MetricLineChart metric={metric} data={chartData} />
-                  )}
-
-                  {currentChartType === "gauge" && (
-                    <MetricGaugeChart metric={metric} data={chartData} />
-                  )}
-
-                  {currentChartType === "dial" && (
-                    <MetricDialChart metric={metric} data={chartData} />
-                  )}
-
-                  {currentChartType === "bar" && (
-                    <MetricBarChart metric={metric} data={chartData} />
-                  )}
-
-                  {currentChartType === "area" && (
-                    <MetricAreaChart metric={metric} data={chartData} />
-                  )}
-
-                  {currentChartType === "scatter" && (
-                    <MetricScatterChart metric={metric} data={chartData} />
-                  )}
-
-                </div>
-
-                <div className="w-full xl:w-64 shrink-0 border border-slate-300 bg-white shadow-sm p-4 flex flex-col justify-center">
-                  <MetricStats data={chartData} />
-                </div>
-
-              </div>
-            );
-          })}
-
-        </div>
-      )}
-
-      <div className="bg-black border-2 border-slate-800 flex flex-col h-[400px]">
-        <div className="bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className={`w-3 h-3 ${connected ? 'bg-emerald-500 animate-pulse' : 'bg-red-600'}`}></span>
-            <span className="text-white font-mono text-xs font-bold uppercase tracking-widest">Stream Output</span>
-          </div>
-          <div className="text-slate-400 font-mono text-xs font-bold uppercase">
-            {data.length} Messages
-          </div>
-        </div>
-
-        <div className="p-4 overflow-y-auto font-mono text-xs sm:text-sm leading-relaxed flex-1 flex flex-col gap-1 custom-scrollbar">
-          {data.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-slate-500 gap-2 opacity-70">
-              <svg className="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-              <span className="uppercase tracking-widest font-bold">{connected ? "WAITING FOR DATA SEQUENCE..." : "SYSTEM DISCONNECTED - CONNECT TO START"}</span>
-            </div>
-          ) : (
-            data.map((d, i) => (
-              <div
-                key={i}
-                className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4 hover:bg-slate-900 p-1.5 transition-colors border-b border-slate-900"
-              >
-                <div className="text-slate-500 shrink-0 font-bold whitespace-nowrap">
-                  {d.timestamp ? new Date(d.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString()}
-                </div>
-                <div className="flex-1 break-all">
-                  <span className="text-emerald-400 font-bold uppercase">[{d.device}]</span>
-                  <span className="text-[#93c5fd] mx-2 font-bold uppercase">{d.metric}:</span>
-                  <span className="text-white font-medium">{d.value}</span>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-=======
->>>>>>> f7f93d9 (Initial commit - UI + AI + MQTT integration)
     </div>
   );
 }
