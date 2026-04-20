@@ -1,8 +1,6 @@
 import Link from "next/link";
 import ExperimentStream from "./ExperimentStream";
 import AIChat from "@/components/AIChat";
-import AIUpload from "./AIUpload"; // ✅ NEW
-
 export default async function ExperimentPage({
   params,
 }: {
@@ -37,45 +35,7 @@ export default async function ExperimentPage({
   }
 
   return (
-    <div className="flex h-full">
-
-      {/* 🔷 LEFT SIDEBAR */}
-      <div className="w-1/4 bg-[#d6eaf8] border-r-4 border-orange-400 p-4 flex flex-col">
-
-        <h2 className="text-xl font-semibold mb-4 text-[#154360]">
-          Experiments
-        </h2>
-
-        <div className="flex-1 overflow-y-auto space-y-2">
-
-          {[
-            "alpha-node",
-            "thermal-camera",
-            "battery-test",
-            "smart-greenhouse",
-            "ml-edge",
-            "distance",
-          ].map((exp) => (
-            <Link
-              key={exp}
-              href={`/experiments/${exp}`}
-              className={`p-3 rounded-lg block transition ${
-                id === exp
-                  ? "bg-orange-200 border-l-4 border-orange-500"
-                  : "bg-white hover:bg-blue-50"
-              }`}
-            >
-              <p className="font-medium text-[#2c3e50]">
-                {exp.replace("-", " ").toUpperCase()}
-              </p>
-            </Link>
-          ))}
-
-        </div>
-      </div>
-
-      {/* 🔷 RIGHT CONTENT */}
-      <div className="flex-1 max-w-6xl mx-auto w-full py-8 px-6 text-slate-900 bg-[#f4f9fd]">
+    <div className="max-w-6xl mx-auto w-full py-8 text-slate-900">
 
         {/* HEADER */}
         <div className="mb-6 border-b-2 border-slate-300 pb-4">
@@ -112,18 +72,13 @@ export default async function ExperimentPage({
           <ExperimentStream dataValues={experiment.dataValues} />
         </div>
 
-        {/* AI CHAT */}
-        <div className="mt-6">
-          <AIChat
-            description={experiment.description}
-            components={experiment.components}
-            dataValues={experiment.dataValues}
-          />
-        </div>
-
-        {/* 🔥 NEW AI UPLOAD SECTION */}
-        <AIUpload />
-
+      {/* AI Section */}
+      <div className="mt-6">
+        <AIChat
+          description={experiment.description}
+          components={experiment.components}
+          dataValues={experiment.dataValues}
+        />
       </div>
     </div>
   );
