@@ -7,10 +7,14 @@ export async function GET(req: NextRequest) {
     try {
         const cookie = req.cookies.get("session")?.value;
         let isAdmin = false;
+        let isLoggedIn = false;
         
         if (cookie) {
              const session = await decrypt(cookie);
-             if (session?.isAdmin) isAdmin = true;
+             if (session) {
+                 isLoggedIn = true;
+                 if (session.isAdmin) isAdmin = true;
+             }
         }
 
         const [rows]: any = await db.query(`
@@ -20,7 +24,7 @@ export async function GET(req: NextRequest) {
             ORDER BY e.created_at DESC
         `);
 
-        return NextResponse.json({ data: rows, isAdmin }); 
+        return NextResponse.json({ data: rows, isAdmin, isLoggedIn }); 
     } catch (error) {
         console.error("Fetch error:", error);
         return NextResponse.json({ message: "Failed to fetch experiments" }, { status: 500 });
