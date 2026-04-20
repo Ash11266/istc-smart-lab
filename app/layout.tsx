@@ -80,8 +80,8 @@ export default function RootLayout({
           </div>
         </header>
 
-        {/* 🔷 MAIN */}
-        <main className="flex-1 relative overflow-hidden">
+        {/* 🔷 MAIN (SCROLL ENABLED) */}
+        <main className="flex-1 overflow-y-auto">
           {children}
         </main>
 

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import ExperimentStream from "./ExperimentStream";
 import AIChat from "@/components/AIChat";
+import AIUpload from "./AIUpload"; // ✅ NEW
 
 export default async function ExperimentPage({
   params,
@@ -71,7 +72,6 @@ export default async function ExperimentPage({
           ))}
 
         </div>
-
       </div>
 
       {/* 🔷 RIGHT CONTENT */}
@@ -112,7 +112,7 @@ export default async function ExperimentPage({
           <ExperimentStream dataValues={experiment.dataValues} />
         </div>
 
-        {/* AI SECTION */}
+        {/* AI CHAT */}
         <div className="mt-6">
           <AIChat
             description={experiment.description}
@@ -121,8 +121,10 @@ export default async function ExperimentPage({
           />
         </div>
 
-      </div>
+        {/* 🔥 NEW AI UPLOAD SECTION */}
+        <AIUpload />
 
+      </div>
     </div>
   );
 }
