@@ -13,9 +13,10 @@ type MqttMessage = {
 interface MetricGaugeChartProps {
   metric: string;
   data: MqttMessage[];
+  unit?: string;
 }
 
-export default function MetricGaugeChart({ metric, data }: MetricGaugeChartProps) {
+export default function MetricGaugeChart({ metric, data, unit }: MetricGaugeChartProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -103,7 +104,7 @@ export default function MetricGaugeChart({ metric, data }: MetricGaugeChartProps
         },
         detail: {
           valueAnimation: true,
-          formatter: (val: number) => val.toFixed(2),
+          formatter: (val: number) => `${val.toFixed(2)}${unit ? ' ' + unit : ''}`,
           color: '#003366',
           fontSize: 22,
           fontWeight: 'bold',
@@ -120,7 +121,7 @@ export default function MetricGaugeChart({ metric, data }: MetricGaugeChartProps
         animationEasing: 'cubicOut',
       },
     ],
-  }), [latestValue, gaugeMax, metric]);
+  }), [latestValue, gaugeMax, metric, unit]);
 
   const isEmpty = data.length === 0;
 

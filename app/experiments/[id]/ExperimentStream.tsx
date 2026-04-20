@@ -36,6 +36,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
 
   type ChartType = "line" | "gauge" | "dial" | "bar" | "area" | "scatter";
   const [chartTypes, setChartTypes] = useState<Record<string, ChartType>>({});
+  const [chartUnits, setChartUnits] = useState<Record<string, string>>({});
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
@@ -424,7 +425,6 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
       </div>
 
       {/* Metric Charts */}
-      {/* Metric Charts */}
       {metricsToDisplay.length > 0 && (
         <div className="flex flex-col gap-6 w-full mt-4 mb-2">
 
@@ -440,52 +440,55 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
 
                 <div className="flex-1 border border-slate-300 bg-white shadow-sm p-4 min-w-0">
 
-                  {/* 🔽 Per-metric dropdown */}
-                  <div className="flex items-center gap-2 mb-3">
-                    <label className="text-sm font-medium">Graph Type:</label>
-                    <select
-                      value={currentChartType}
-                      onChange={(e) => {
-                        const value = e.target.value as ChartType;
+                  {/* 🔽 Per-metric dropdown and unit input */}
+                  <div className="flex items-center gap-4 mb-3">
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm font-medium">Graph Type:</label>
+                      <select
+                        value={currentChartType}
+                        onChange={(e) => {
+                          const value = e.target.value as ChartType;
 
-                        setChartTypes(prev => ({
-                          ...prev,
-                          [metric]: value
-                        }));
-                      }}
-                      className="border border-slate-300 rounded px-2 py-1"
-                    >
-                      <option value="line">Line</option>
-                      <option value="gauge">Gauge</option>
-                      <option value="dial">Dial</option>
-                      <option value="bar">Bar</option>
-                      <option value="area">Area</option>
-                      <option value="scatter">Scatter</option>
-                    </select>
+                          setChartTypes(prev => ({
+                            ...prev,
+                            [metric]: value
+                          }));
+                        }}
+                        className="border border-slate-300 rounded px-2 py-1 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#003366]"
+                      >
+                        <option value="line">Line</option>
+                        <option value="gauge">Gauge</option>
+                        <option value="dial">Dial</option>
+                      </select>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm font-medium">Unit:</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. °C, V"
+                        value={chartUnits[metric] || ""}
+                        onChange={(e) => {
+                          setChartUnits(prev => ({
+                            ...prev,
+                            [metric]: e.target.value
+                          }));
+                        }}
+                        className="border border-slate-300 rounded px-2 py-1 w-24 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#003366]"
+                      />
+                    </div>
                   </div>
 
                   {currentChartType === "line" && (
-                    <MetricLineChart metric={metric} data={chartData} />
+                    <MetricLineChart metric={metric} data={chartData} unit={chartUnits[metric]} />
                   )}
 
                   {currentChartType === "gauge" && (
-                    <MetricGaugeChart metric={metric} data={chartData} />
+                    <MetricGaugeChart metric={metric} data={chartData} unit={chartUnits[metric]} />
                   )}
 
                   {currentChartType === "dial" && (
-                    <MetricDialChart metric={metric} data={chartData} />
-                  )}
-
-                  {currentChartType === "bar" && (
-                    <MetricBarChart metric={metric} data={chartData} />
-                  )}
-
-                  {currentChartType === "area" && (
-                    <MetricAreaChart metric={metric} data={chartData} />
-                  )}
-
-                  {currentChartType === "scatter" && (
-                    <MetricScatterChart metric={metric} data={chartData} />
+                    <MetricDialChart metric={metric} data={chartData} unit={chartUnits[metric]} />
                   )}
 
                 </div>
