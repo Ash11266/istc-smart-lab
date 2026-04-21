@@ -459,6 +459,9 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
                         <option value="line">Line</option>
                         <option value="gauge">Gauge</option>
                         <option value="dial">Dial</option>
+                        <option value="bar">Bar</option>
+                        <option value="area">Area</option>
+                        <option value="scatter">Scatter</option>
                       </select>
                     </div>
 
