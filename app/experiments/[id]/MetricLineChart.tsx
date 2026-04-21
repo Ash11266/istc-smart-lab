@@ -13,10 +13,9 @@ type MqttMessage = {
 interface MetricLineChartProps {
   metric: string;
   data: MqttMessage[];
-  unit?: string;
 }
 
-export default function MetricLineChart({ metric, data, unit }: MetricLineChartProps) {
+export default function MetricLineChart({ metric, data }: MetricLineChartProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -60,7 +59,7 @@ export default function MetricLineChart({ metric, data, unit }: MetricLineChartP
           if (!pt) return '';
           const date = new Date(pt.value[0]);
           const timeStr = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
-          return `${timeStr}<br/>${pt.seriesName}: <b>${pt.value[1]} ${unit || ''}</b>`;
+          return `${timeStr}<br/>${pt.seriesName}: <b>${pt.value[1]}</b>`;
         }
       },
       grid: {
@@ -86,12 +85,6 @@ export default function MetricLineChart({ metric, data, unit }: MetricLineChartP
       },
       yAxis: {
         type: 'value',
-        name: unit || '',
-        nameTextStyle: {
-          color: '#475569',
-          fontSize: 10,
-          align: 'right'
-        },
         splitLine: { show: true, lineStyle: { color: '#e2e8f0', type: 'solid' } },
         axisLine: { show: true, lineStyle: { color: '#64748b' } },
         axisTick: { show: true, lineStyle: { color: '#64748b' } },
@@ -118,7 +111,7 @@ export default function MetricLineChart({ metric, data, unit }: MetricLineChartP
         }
       ]
     };
-  }, [data, metric, unit]);
+  }, [data, metric]);
 
   const isEmpty = data.length === 0;
 
