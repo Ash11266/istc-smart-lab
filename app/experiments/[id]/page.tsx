@@ -1,129 +1,140 @@
+"use client";
+
 import Link from "next/link";
 import ExperimentStream from "./ExperimentStream";
 import AIChat from "@/components/AIChat";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import ScrollToTop from "@/components/ScrollToTop";
 
-export default async function ExperimentPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
 
-  const res = await fetch(`http://localhost:3000/api/experiments/${id}`, {
-    cache: "no-store",
-  });
+export default function ExperimentPage() {
+  const params = useParams();
+  const id = params.id as string;
 
-  let experiment = null;
+  const [experiment, setExperiment] = useState<any>(null);
+  const [experiments, setExperiments] = useState<any[]>([]);
 
-  if (res.ok) {
-    experiment = await res.json();
-  }
+  useEffect(() => {
+    fetch(`/api/experiments/${id}`)
+      .then((res) => res.json())
+      .then((data) => setExperiment(data));
 
-  // Fetch all experiments for sidebar
-  const allRes = await fetch("http://localhost:3000/api/experiments", {
-    cache: "no-store",
-  });
-  let allExperiments: any[] = [];
-  if (allRes.ok) {
-    const data = await allRes.json();
-    allExperiments = Array.isArray(data) ? data : data.data || [];
-  }
+    fetch("/api/experiments")
+      .then((res) => res.json())
+      .then((data) => {
+        const list = Array.isArray(data) ? data : data.data || [];
+        setExperiments(list);
+      });
+  }, [id]);
 
   if (!experiment) {
     return (
-      <div className="max-w-2xl mx-auto py-24 px-4 text-center text-slate-900">
-        <div className="bg-white border-2 border-red-700 p-8 shadow-sm">
-          <h2 className="text-2xl font-bold mb-2 text-red-700">
-            Record Not Found
-          </h2>
-          <p className="mb-6">
-            Experiment ID: <b>{id}</b> not found
-          </p>
-          <Link href="/experiments">Back</Link>
-        </div>
+      
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-lg text-gray-500">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="flex h-full">
+    <div className="flex min-h-screen">
 
-      {/* 🔷 LEFT SIDEBAR */}
-      <div className="w-1/4 bg-[#d6eaf8] border-r-4 border-orange-400 p-4 flex flex-col">
+      {/* 🔷 SIDEBAR */}
+      <div className="w-72 bg-gradient-to-b from-[#e8f6f3] to-[#d1f2eb] border-r-[5px] border-orange-500 p-4 flex flex-col">
 
-        <h2 className="text-xl font-semibold mb-4 text-[#154360]">
+        <h2 className="text-xl font-bold mb-3 text-[#0B5D57]">
           Experiments
         </h2>
 
-        <div className="flex-1 overflow-y-auto space-y-2">
+        {/* 🔥 CREATE BUTTON */}
+        <Link
+          href="/experiments/create"
+          className="mb-4 text-center bg-white-500 hover:bg-white-600 text-orange font-bold py-2 px-4 rounded-lg shadow-md transition"
+        >
+          + Create Experiment
+        </Link>
 
-          {allExperiments.map((exp: any) => (
+        {/* SCROLLABLE LIST */}
+        <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+
+          {experiments.map((exp) => (
             <Link
               key={exp.uuid}
               href={`/experiments/${exp.uuid}`}
-              className={`p-3 rounded-lg block transition shadow-sm ${
+              className={`block p-3 rounded-xl transition-all border-l-4 ${
                 id === exp.uuid
-                  ? "bg-orange-200 border-l-4 border-orange-500"
-                  : "bg-white hover:bg-blue-50"
+                  ? "bg-[#d1f2eb] border-[#0B5D57] shadow-md"
+                  : "bg-white border-transparent hover:bg-[#d1f2eb] hover:border-[#0B5D57]"
               }`}
             >
-              <p className="font-medium text-[#2c3e50]">
+              <p className="font-semibold text-[#0B5D57]">
                 {exp.name}
               </p>
             </Link>
           ))}
 
         </div>
-
       </div>
 
       {/* 🔷 RIGHT CONTENT */}
-      <div className="flex-1 overflow-y-auto h-full bg-[#f4f9fd]">
-        <div className="max-w-6xl mx-auto w-full py-8 px-6 text-slate-900">
+      <div className="flex-1 overflow-y-auto bg-gradient-to-br from-[#f0fbfa] to-white">
+
+        <div className="max-w-6xl mx-auto py-8 px-6">
 
           {/* HEADER */}
-        <div className="mb-6 border-b-2 border-slate-300 pb-4">
-          <Link
-            href="/experiments"
-            className="inline-flex items-center text-sm font-bold text-[#003366] hover:underline mb-4 uppercase tracking-wider"
-          >
-            Back to Directory
-          </Link>
+          <div className="mb-6 border-b pb-4">
+            <Link
+              href="/experiments"
+              className="text-sm font-bold text-[#0B5D57] hover:underline"
+            >
+              ← Back
+            </Link>
 
-          <h1 className="text-4xl font-semibold text-[#154360]">
-            {experiment.name}
-          </h1>
-        </div>
-
-        {/* INFO */}
-        <div className="grid md:grid-cols-2 gap-8">
-
-          <div className="bg-white border p-6 rounded-lg shadow-sm">
-            <h2 className="text-xl font-bold mb-4">Overview</h2>
-            <p>{experiment.description || "No description"}</p>
+            <h1 className="text-4xl font-bold text-[#0B5D57] mt-2">
+              {experiment.name}
+            </h1>
           </div>
 
-          <div className="bg-white border p-6 rounded-lg shadow-sm">
-            <h2 className="text-xl font-bold mb-4">Components</h2>
-            <p>{experiment.components || "None"}</p>
+          {/* CARDS */}
+          <div className="grid md:grid-cols-2 gap-6">
+
+            <div className="bg-white p-6 rounded-xl shadow border">
+              <h2 className="text-xl font-bold mb-3 text-[#0B5D57]">
+                Overview
+              </h2>
+              <p className="text-gray-700">
+                {experiment.description || "No description"}
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow border">
+              <h2 className="text-xl font-bold mb-3 text-[#0B5D57]">
+                Components
+              </h2>
+              <p className="text-gray-700">
+                {experiment.components || "None"}
+              </p>
+            </div>
+
           </div>
 
-        </div>
+          {/* LIVE DATA */}
+          <div className="bg-white p-6 mt-6 rounded-xl shadow border">
+            <h2 className="text-xl font-bold mb-3 text-[#0B5D57]">
+              Live Data
+            </h2>
+            <ExperimentStream dataValues={experiment.dataValues} />
+          </div>
 
-        {/* LIVE DATA */}
-        <div className="bg-white border p-6 mt-6 rounded-lg shadow-sm">
-          <h2 className="text-xl font-bold mb-4">Live Data</h2>
-          <ExperimentStream dataValues={experiment.dataValues} />
-        </div>
-
-        {/* AI SECTION */}
-        <div className="mt-6">
-          <AIChat
-            description={experiment.description}
-            components={experiment.components}
-            dataValues={experiment.dataValues}
-          />
-        </div>
+          {/* AI */}
+          <div className="mt-6 mb-10">
+            <AIChat
+              description={experiment.description}
+              components={experiment.components}
+              dataValues={experiment.dataValues}
+            />
+          </div>
 
         </div>
       </div>
