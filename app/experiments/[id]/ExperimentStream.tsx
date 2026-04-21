@@ -41,7 +41,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   // Custom Buttons state
-  const [customButtons, setCustomButtons] = useState<{label: string, message: string}[]>([]);
+  const [customButtons, setCustomButtons] = useState<{ label: string, message: string }[]>([]);
   const [isAddingButton, setIsAddingButton] = useState(false);
   const [newBtnLabel, setNewBtnLabel] = useState("");
   const [newBtnMessage, setNewBtnMessage] = useState("");
@@ -51,7 +51,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
     if (saved) {
       try {
         setCustomButtons(JSON.parse(saved));
-      } catch (e) {}
+      } catch (e) { }
     }
   }, []);
 
@@ -369,7 +369,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
               >
                 Send
               </button>
-              
+
               <button
                 onClick={() => setIsAddingButton(!isAddingButton)}
                 className={`px-4 py-2 text-sm font-bold uppercase tracking-wider transition-colors shadow-sm ${isAddingButton ? "bg-slate-700 text-white" : "bg-slate-200 hover:bg-slate-300 text-slate-800"}`}
@@ -379,46 +379,46 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
               </button>
             </div>
           </div>
-          
+
           {isAddingButton && (
             <div className="flex gap-3 mt-4 p-4 bg-white border-2 border-[#003366] w-full justify-center items-center shadow-md animate-in fade-in slide-in-from-top-2">
-               <span className="text-sm font-bold uppercase text-[#003366]">New Button:</span>
-               <input 
-                 type="text" 
-                 placeholder="Label (e.g. Calibrate)" 
-                 value={newBtnLabel} 
-                 onChange={e => setNewBtnLabel(e.target.value)}
-                 className="px-3 py-2 border border-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#003366]"
-               />
-               <input 
-                 type="text" 
-                 placeholder="Message (e.g. CMD_CAL)" 
-                 value={newBtnMessage} 
-                 onChange={e => setNewBtnMessage(e.target.value)}
-                 onKeyDown={(e) => {
-                   if (e.key === "Enter" && newBtnLabel && newBtnMessage) {
-                     setCustomButtons([...customButtons, { label: newBtnLabel, message: newBtnMessage }]);
-                     setNewBtnLabel("");
-                     setNewBtnMessage("");
-                     setIsAddingButton(false);
-                   }
-                 }}
-                 className="px-3 py-2 border border-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#003366]"
-               />
-               <button 
-                 onClick={() => {
-                   if (newBtnLabel && newBtnMessage) {
-                     setCustomButtons([...customButtons, { label: newBtnLabel, message: newBtnMessage }]);
-                     setNewBtnLabel("");
-                     setNewBtnMessage("");
-                     setIsAddingButton(false);
-                   }
-                 }}
-                 disabled={!newBtnLabel || !newBtnMessage}
-                 className={`px-6 py-2 text-white text-sm font-bold uppercase tracking-wider transition-colors shadow-sm ${(!newBtnLabel || !newBtnMessage) ? "bg-slate-400 cursor-not-allowed" : "bg-emerald-600 hover:bg-emerald-700"}`}
-               >
-                 Save
-               </button>
+              <span className="text-sm font-bold uppercase text-[#003366]">New Button:</span>
+              <input
+                type="text"
+                placeholder="Label (e.g. Calibrate)"
+                value={newBtnLabel}
+                onChange={e => setNewBtnLabel(e.target.value)}
+                className="px-3 py-2 border border-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#003366]"
+              />
+              <input
+                type="text"
+                placeholder="Message (e.g. CMD_CAL)"
+                value={newBtnMessage}
+                onChange={e => setNewBtnMessage(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && newBtnLabel && newBtnMessage) {
+                    setCustomButtons([...customButtons, { label: newBtnLabel, message: newBtnMessage }]);
+                    setNewBtnLabel("");
+                    setNewBtnMessage("");
+                    setIsAddingButton(false);
+                  }
+                }}
+                className="px-3 py-2 border border-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#003366]"
+              />
+              <button
+                onClick={() => {
+                  if (newBtnLabel && newBtnMessage) {
+                    setCustomButtons([...customButtons, { label: newBtnLabel, message: newBtnMessage }]);
+                    setNewBtnLabel("");
+                    setNewBtnMessage("");
+                    setIsAddingButton(false);
+                  }
+                }}
+                disabled={!newBtnLabel || !newBtnMessage}
+                className={`px-6 py-2 text-white text-sm font-bold uppercase tracking-wider transition-colors shadow-sm ${(!newBtnLabel || !newBtnMessage) ? "bg-slate-400 cursor-not-allowed" : "bg-emerald-600 hover:bg-emerald-700"}`}
+              >
+                Save
+              </button>
             </div>
           )}
         </div>
@@ -489,6 +489,18 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
 
                   {currentChartType === "dial" && (
                     <MetricDialChart metric={metric} data={chartData} unit={chartUnits[metric]} />
+                  )}
+
+                  {currentChartType === "area" && (
+                    <MetricAreaChart metric={metric} data={chartData} />
+                  )}
+
+                  {currentChartType === "bar" && (
+                    <MetricBarChart metric={metric} data={chartData} />
+                  )}
+
+                  {currentChartType === "scatter" && (
+                    <MetricScatterChart metric={metric} data={chartData} />
                   )}
 
                 </div>
