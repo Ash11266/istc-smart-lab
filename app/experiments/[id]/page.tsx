@@ -21,6 +21,16 @@ export default async function ExperimentPage({
     experiment = await res.json();
   }
 
+  // Fetch all experiments for sidebar
+  const allRes = await fetch("http://localhost:3000/api/experiments", {
+    cache: "no-store",
+  });
+  let allExperiments: any[] = [];
+  if (allRes.ok) {
+    const data = await allRes.json();
+    allExperiments = Array.isArray(data) ? data : data.data || [];
+  }
+
   if (!experiment) {
     return (
       <div className="max-w-2xl mx-auto py-24 px-4 text-center text-slate-900">
@@ -47,25 +57,18 @@ export default async function ExperimentPage({
         </h2>
 
         <div className="flex-1 overflow-y-auto space-y-2">
-          {[
-            "alpha-node",
-            "thermal-camera",
-            "battery-test",
-            "smart-greenhouse",
-            "ml-edge",
-            "distance",
-          ].map((exp) => (
+
+          {allExperiments.map((exp: any) => (
             <Link
-              key={exp}
-              href={`/experiments/${exp}`}
-              className={`p-3 rounded-lg block transition ${
-                id === exp
+              key={exp.uuid}
+              href={`/experiments/${exp.uuid}`}
+              className={`p-3 rounded-lg block transition shadow-sm ${id === exp.uuid
                   ? "bg-orange-200 border-l-4 border-orange-500"
                   : "bg-white hover:bg-blue-50"
-              }`}
+                }`}
             >
               <p className="font-medium text-[#2c3e50]">
-                {exp.replace("-", " ").toUpperCase()}
+                {exp.name}
               </p>
             </Link>
           ))}
@@ -73,55 +76,52 @@ export default async function ExperimentPage({
       </div>
 
       {/* 🔷 RIGHT CONTENT */}
-      <div className="flex-1 max-w-6xl mx-auto w-full py-8 px-6 pb-32 text-slate-900 bg-[#f4f9fd] overflow-y-auto">
-        {/* HEADER */}
-        <div className="mb-6 border-b-2 border-slate-300 pb-4">
-          <Link
-            href="/experiments"
-            className="inline-flex items-center text-sm font-bold text-[#003366] hover:underline mb-4 uppercase tracking-wider"
-          >
-            Back to Directory
-          </Link>
+      <div className="flex-1 overflow-y-auto h-full bg-[#f4f9fd]">
+        <div className="max-w-6xl mx-auto w-full py-8 px-6 text-slate-900">
 
-          <h1 className="text-4xl font-semibold text-[#154360]">
-            {experiment.name}
-          </h1>
-        </div>
+          {/* HEADER */}
+          <div className="mb-6 border-b-2 border-slate-300 pb-4">
+            <Link
+              href="/experiments"
+              className="inline-flex items-center text-sm font-bold text-[#003366] hover:underline mb-4 uppercase tracking-wider"
+            >
+              Back to Directory
+            </Link>
 
-        {/* INFO */}
-        <div className="grid md:grid-cols-2 gap-8">
-          <div className="bg-white border p-6 rounded-lg shadow-sm">
-            <h2 className="text-xl font-bold mb-4">Overview</h2>
-            <p>{experiment.description || "No description"}</p>
+            <h1 className="text-4xl font-semibold text-[#154360]">
+              {experiment.name}
+            </h1>
           </div>
 
-          <div className="bg-white border p-6 rounded-lg shadow-sm">
-            <h2 className="text-xl font-bold mb-4">Components</h2>
-            <p>{experiment.components || "None"}</p>
+          {/* INFO */}
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="bg-white border p-6 rounded-lg shadow-sm">
+              <h2 className="text-xl font-bold mb-4">Overview</h2>
+              <p>{experiment.description || "No description"}</p>
+            </div>
+
+            <div className="bg-white border p-6 rounded-lg shadow-sm">
+              <h2 className="text-xl font-bold mb-4">Components</h2>
+              <p>{experiment.components || "None"}</p>
+            </div>
           </div>
+
+          {/* LIVE DATA */}
+          <div className="bg-white border p-6 mt-6 rounded-lg shadow-sm">
+            <h2 className="text-xl font-bold mb-4">Live Data</h2>
+            <ExperimentStream dataValues={experiment.dataValues} />
+          </div>
+
+          {/* AI CHAT */}
+          <div className="mt-6">
+            <AIChat
+              description={experiment.description}
+              components={experiment.components}
+              dataValues={experiment.dataValues}
+            />
+          </div>
+
         </div>
-
-        {/* LIVE DATA */}
-        <div className="bg-white border p-6 mt-6 rounded-lg shadow-sm">
-          <h2 className="text-xl font-bold mb-4">Live Data</h2>
-          <ExperimentStream dataValues={experiment.dataValues} />
-        </div>
-
-        {/* AI CHAT */}
-        <div className="mt-6">
-          <AIChat
-            description={experiment.description}
-            components={experiment.components}
-            dataValues={experiment.dataValues}
-          />
-        </div>
-
-        {/* 🔥 AI FILE ANALYSIS */}
-        <AIUpload />
-
-        {/* 🔥 ML PREDICTION */}
-        <MLPrediction />
-
       </div>
     </div>
   );

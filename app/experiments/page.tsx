@@ -2,14 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+
+
 
 export default function ExperimentsPage() {
   const router = useRouter();
-
   const [experiments, setExperiments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     fetch("/api/experiments")
@@ -20,6 +23,7 @@ export default function ExperimentsPage() {
         } else if (data.data) {
           setExperiments(data.data);
           setIsAdmin(!!data.isAdmin);
+          setIsLoggedIn(!!data.isLoggedIn);
         } else {
           setExperiments([]);
         }
@@ -30,9 +34,9 @@ export default function ExperimentsPage() {
         setLoading(false);
       });
   }, []);
-
   const handleDelete = async (e: React.MouseEvent, uuid: string) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!confirm("Are you sure you want to delete this experiment?")) return;
 
     try {
@@ -61,69 +65,41 @@ export default function ExperimentsPage() {
           Experiments
         </h2>
 
-        <div className="space-y-2">
-          {experiments.map((exp, index) => (
-            <div
-              key={index}
-              onClick={() => router.push(`/experiments/${exp.route || exp.uuid}`)}
-              className="p-3 rounded-lg cursor-pointer bg-white hover:bg-blue-50"
+        {isLoggedIn && (
+          <Link href="/experiments/create" className="mb-4 text-center bg-orange-400 hover:bg-orange-500 text-white font-medium py-2 px-4 rounded shadow-sm transition">
+            + Create Experiment
+          </Link>
+        )}
+
+        <div className="flex-1 overflow-y-auto space-y-2">
+
+          {experiments.map((exp, idx) => (
+            <div key={exp.uuid || idx} onClick={() => router.push(`/experiments/${exp.uuid}`)}
+              className="group p-3 rounded-lg cursor-pointer transition-all duration-200 shadow-sm bg-white hover:bg-blue-50 flex justify-between items-center"
             >
               <p className="font-medium text-[#2c3e50]">{exp.name}</p>
-
-              <span
-                className={`text-xs px-2 py-1 rounded mt-1 inline-block ${
-                  exp.active
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-600"
-                }`}
-              >
-                {exp.active ? "Active" : "Inactive"}
-              </span>
+              {isAdmin && (
+                <button
+                  onClick={(e) => handleDelete(e, exp.uuid)}
+                  className="hidden group-hover:block bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600 transition shadow-sm"
+                >
+                  Delete
+                </button>
+              )}
             </div>
           ))}
         </div>
       </div>
 
-      {/* 🔷 RIGHT SIDE */}
-      <div className="flex-1 p-6 bg-[#f4f9fd]">
+      {/* 🔷 RIGHT SIDE DEFAULT */}
+      <div className="flex-1 flex items-center justify-center bg-[#f4f9fd]">
 
         <h1 className="text-2xl font-bold mb-6 text-[#154360]">
           Experiments Directory
         </h1>
 
-        {loading ? (
-          <p>Loading...</p>
-        ) : (
-          <div className="grid md:grid-cols-2 gap-4">
-            {experiments.map((exp, idx) => (
-              <Link
-                key={exp.uuid || idx}
-                href={`/experiments/${exp.uuid}`}
-              >
-                <div className="bg-white border p-4 hover:bg-slate-50 cursor-pointer relative">
-
-                  {/* DELETE BUTTON */}
-                  {isAdmin && (
-                    <button
-                      onClick={(e) => handleDelete(e, exp.uuid)}
-                      className="absolute top-2 right-2 text-xs bg-red-100 text-red-700 px-2 py-1 rounded"
-                    >
-                      Delete
-                    </button>
-                  )}
-
-                  <h3 className="font-bold text-lg">{exp.name}</h3>
-
-                  <p className="text-sm text-gray-600 mt-2">
-                    {exp.description || "No description"}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-
       </div>
+
     </div>
   );
 }

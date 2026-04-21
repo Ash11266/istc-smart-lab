@@ -13,9 +13,10 @@ type MqttMessage = {
 interface MetricDialChartProps {
   metric: string;
   data: MqttMessage[];
+  unit?: string;
 }
 
-export default function MetricDialChart({ metric, data }: MetricDialChartProps) {
+export default function MetricDialChart({ metric, data, unit }: MetricDialChartProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -141,7 +142,7 @@ export default function MetricDialChart({ metric, data }: MetricDialChartProps) 
         detail: {
           show: true,
           valueAnimation: true,
-          formatter: (val: number) => `{value|${val.toFixed(2)}}\n{label|${metric.toUpperCase()}}`,
+          formatter: (val: number) => `{value|${val.toFixed(2)}${unit ? ' ' + unit : ''}}\n{label|${metric.toUpperCase()}}`,
           rich: {
             value: {
               fontSize: 24,
@@ -163,7 +164,7 @@ export default function MetricDialChart({ metric, data }: MetricDialChartProps) 
         animationEasing: 'cubicOut',
       },
     ],
-  }), [latestValue, dialMax, metric, pct]);
+  }), [latestValue, dialMax, metric, pct, unit]);
 
   const isEmpty = data.length === 0;
 
