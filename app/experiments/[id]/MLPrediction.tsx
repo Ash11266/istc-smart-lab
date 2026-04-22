@@ -26,8 +26,6 @@ export default function MLPrediction() {
       });
 
       const data = await res.json();
-      console.log(data);
-
       setPrediction(data);
 
     } catch (err) {
@@ -54,42 +52,49 @@ export default function MLPrediction() {
       {/* FILE NAME */}
       {file && (
         <p className="text-sm text-gray-700 mb-3">
-          Selected: <b>{file.name}</b>
+          Uploaded File: <b>{file.name}</b>
         </p>
       )}
 
-      {/* 🚨 FORCE VISIBLE BUTTON */}
-      <div style={{ marginTop: "10px" }}>
-        <button
-          onClick={handlePredict}
-          disabled={loading}
-          style={{
-            backgroundColor: loading ? "gray" : "green",
-            color: "white",
-            padding: "10px 16px",
-            borderRadius: "6px",
-            display: "block",
-            width: "200px",
-            fontWeight: "bold",
-          }}
-        >
-          {loading ? "Processing..." : "Run ML Prediction"}
-        </button>
-      </div>
+      {/* ✅ RUN BUTTON */}
+      <button
+        onClick={handlePredict}
+        disabled={loading}
+        style={{ backgroundColor: loading ? "#9ca3af" : "#0B5D57" }}
+        className="px-6 py-2.5 mt-2 rounded-md font-bold text-white shadow-md transition-transform hover:scale-105 hover:shadow-lg"
+      >
+        {loading ? "Processing..." : "Run ML"}
+      </button>
 
-      {/* RESULT */}
+      {/* RESULT SECTION */}
       {prediction && (
-        <div
-          style={{
-            marginTop: "15px",
-            padding: "10px",
-            background: "#e6fffa",
-            border: "1px solid #ccc",
-            borderRadius: "6px",
-          }}
-        >
-          <p><b>Prediction:</b> {prediction.result}</p>
+        <div className="mt-5 p-4 bg-green-50 border rounded-lg">
+
+          <h3 className="text-lg font-bold mb-2">
+            {prediction.result}
+          </h3>
+
           <p><b>Accuracy:</b> {prediction.accuracy}</p>
+          <p><b>Total Rows:</b> {prediction.total_rows}</p>
+          <p><b>Anomalies Found:</b> {prediction.anomalies}</p>
+
+          {/* Anomaly Score */}
+          {prediction.anomaly_score !== undefined && (
+            <p><b>Anomaly Score:</b> {prediction.anomaly_score}</p>
+          )}
+
+          {/* Reasons */}
+          {prediction.reasons && prediction.reasons.length > 0 && (
+            <div className="mt-3">
+              <p className="font-semibold">Reasons:</p>
+              <ul className="list-disc ml-5">
+                {prediction.reasons.map((r: string, i: number) => (
+                  <li key={i}>{r}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
         </div>
       )}
 
