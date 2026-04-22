@@ -1,35 +1,81 @@
 import "./globals.css";
 import LiveTime from "@/components/LiveTime";
 import BackgroundVideo from "./components/BackgroundVideo";
+import Link from "next/link";
+import { cookies } from "next/headers";
+import { decrypt } from "@/lib/auth";
 
 export const metadata = {
   title: "Data Acquisition & Monitoring System",
   description: "Research Lab Interface",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get("session")?.value;
+  let isLoggedIn = false;
+  let isAdmin = false;
+
+  if (sessionCookie) {
+    const session = await decrypt(sessionCookie);
+    if (session) {
+      isLoggedIn = true;
+      if (session.isAdmin) {
+        isAdmin = true;
+      }
+    }
+  }
+
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col bg-[#e6edf3] text-black">
 
-        {/* HEADER */}
         <header
-          className="w-full h-24 flex items-center justify-center relative shadow-md border-b-[5px] border-orange-400"
+          className="w-full h-24 flex items-center justify-between px-6 relative shadow-md border-b-[5px] border-orange-400"
           style={{ backgroundColor: "#0B5D57" }}
         >
-          <img
-            src="/logo.png"
-            alt="logo"
-            className="h-14 w-14 absolute left-6 bg-white rounded-md p-1 shadow"
-          />
+          <div className="flex items-center gap-4">
+            <Link href="/">
+              <img
+                src="/logo.png"
+                alt="logo"
+                className="h-14 w-14 bg-white rounded-md p-1 shadow hover:scale-105 transition-transform"
+              />
+            </Link>
+          </div>
 
-          <h1 className="text-2xl md:text-4xl font-semibold text-white tracking-wide text-center">
+          <h1 className="text-xl md:text-3xl font-semibold text-white tracking-wide text-center absolute left-1/2 transform -translate-x-1/2">
             Data Acquisition & Monitoring System
           </h1>
+
+          <nav className="flex items-center gap-4 z-10">
+            {isLoggedIn && (
+              <Link 
+                href="/experiments"
+                className="px-4 py-2 text-sm font-semibold text-white border-2 border-white/20 rounded-lg hover:bg-white/10 hover:border-white/40 transition-all"
+              >
+                Experiments
+              </Link>
+            )}
+            {isAdmin && (
+              <Link 
+                href="/admin"
+                className="px-4 py-2 text-sm font-semibold text-white bg-orange-500 border-2 border-orange-500 rounded-lg hover:bg-orange-600 hover:border-orange-600 transition-all shadow-md shadow-orange-500/20"
+              >
+                Admin Panel
+              </Link>
+            )}
+            <Link 
+              href="/profile"
+              className="px-4 py-2 text-sm font-semibold text-[#0B5D57] bg-white rounded-lg hover:bg-orange-50 transition-colors shadow-sm"
+            >
+              {isLoggedIn ? "Profile" : "Login"}
+            </Link>
+          </nav>
         </header>
 
         {/* MAIN (NO SCROLL) */}

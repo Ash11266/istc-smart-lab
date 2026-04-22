@@ -17,30 +17,35 @@ export default function ExperimentsPage() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    fetch("/api/experiments")
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) {
-          setExperiments(data);
-        } else {
-          setExperiments([
-            { uuid: "alpha-node", name: "Alpha Node Sensor Diagnostic", active: true },
-            { uuid: "thermal-camera", name: "Thermal Camera Calibration", active: true },
-            { uuid: "battery-test", name: "Battery Discharge Test", active: false },
-            { uuid: "smart-greenhouse", name: "Smart Greenhouse", active: true },
-            { uuid: "ml-edge", name: "ML Edge Inference", active: false },
-            { uuid: "distance", name: "Distance Measurement", active: true },
-          ]);
+    const fetchExperiments = async () => {
+      try {
+        const res = await fetch("/api/experiments");
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch experiments");
         }
+
+        const result = await res.json();
+
+        if (result && Array.isArray(result.data)) {
+          setExperiments(result.data);
+          setIsAdmin(result.isAdmin || false);
+          setIsLoggedIn(result.isLoggedIn || false);
+        } else if (Array.isArray(result)) {
+          setExperiments(result);
+        } else {
+          console.warn("Unexpected response:", result);
+          setExperiments([]);
+        }
+      } catch (error) {
+        console.error("Fetch error:", error);
+        setExperiments([]);
+      } finally {
         setLoading(false);
-      })
-      .catch(() => {
-        setExperiments([
-          { uuid: "alpha-node", name: "Alpha Node Sensor Diagnostic", active: true },
-          { uuid: "thermal-camera", name: "Thermal Camera Calibration", active: true },
-        ]);
-        setLoading(false);
-      });
+      }
+    };
+
+    fetchExperiments();
   }, []);
 
   const handleDelete = async (e: React.MouseEvent, uuid: string) => {
@@ -87,7 +92,7 @@ export default function ExperimentsPage() {
         {isLoggedIn && (
           <Link
             href="/experiments/create"
-            className="mb-4 text-center bg-white-500 hover:bg-orange-600 text-orange font-bold py-2 px-4 rounded-lg shadow-lg shadow-orange-300/50 hover:shadow-orange-400/70 transition transform hover:scale-105"
+            className="mb-4 text-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg shadow-orange-300/50 hover:shadow-orange-400/70 transition transform hover:scale-105"
           >
             + Create Experiment
           </Link>
@@ -95,8 +100,6 @@ export default function ExperimentsPage() {
 
         {/* LIST */}
         <div className="flex-1 overflow-y-auto space-y-3 pr-1">
-
-<<<<<<< HEAD
           {filteredExperiments.map((exp, idx) => {
             const isActive = selectedId === exp.uuid;
 
@@ -115,9 +118,14 @@ export default function ExperimentsPage() {
                   }
                 `}
               >
-                <p className="font-semibold text-[#0B5D57]">
-                  {exp.name}
-                </p>
+                <div>
+                  <p className="font-semibold text-[#0B5D57]">
+                    {exp.name}
+                  </p>
+                  {exp.is_private ? (
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 bg-slate-200 px-1.5 py-0.5 rounded mt-1 w-fit block">Private</span>
+                  ) : null}
+                </div>
 
                 {isAdmin && (
                   <button
@@ -130,45 +138,11 @@ export default function ExperimentsPage() {
               </div>
             );
           })}
-
-        </div>
-      </div>
-
-      {/* 🔷 RIGHT SIDE */}
-      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-[#f0fbfa]/80 to-white/80 backdrop-blur-sm">
-
-        <div className="text-center">
-
-          <h1 className="text-4xl font-bold text-[#0B5D57] mb-3">
-            Welcome 👋
-          </h1>
-
-          <p className="text-lg text-gray-500">
-            Select an experiment from the left
-          </p>
-=======
-          {experiments.map((exp, idx) => (
-            <div key={exp.uuid || idx} onClick={() => router.push(`/experiments/${exp.uuid}`)}
-              className="group p-3 rounded-lg cursor-pointer transition-all duration-200 shadow-sm bg-white hover:bg-blue-50 flex justify-between items-center"
-            >
-              <div className="flex flex-col">
-                <p className="font-medium text-[#2c3e50]">{exp.name}</p>
-                {exp.is_private ? (
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 bg-slate-200 px-1.5 py-0.5 rounded mt-1 w-fit">Private</span>
-                ) : null}
-              </div>
-              {isAdmin && (
-                <button
-                  onClick={(e) => handleDelete(e, exp.uuid)}
-                  className="hidden group-hover:block bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600 transition shadow-sm"
-                >
-                  Delete
-                </button>
-              )}
+          {filteredExperiments.length === 0 && !loading && (
+            <div className="text-center text-slate-500 mt-4 italic">
+              No experiments found.
             </div>
-          ))}
->>>>>>> PageDesign
-
+          )}
         </div>
 
       </div>

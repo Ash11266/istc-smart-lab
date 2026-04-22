@@ -7,7 +7,9 @@ import MetricStats from "./MetricStats";
 const MetricLineChart = dynamic(() => import("./MetricLineChart"), { ssr: false });
 const MetricDialChart = dynamic(() => import("./MetricDialChart"), { ssr: false });
 const MetricGaugeChart = dynamic(() => import("./MetricGaugeChart"), { ssr: false });
-
+const MetricAreaChart = dynamic(() => import("./MetricAreaChart"), { ssr: false });
+const MetricBarChart = dynamic(() => import("./MetricBarChart"), { ssr: false });
+const MetricScatterChart = dynamic(() => import("./MetricScatterChart"), { ssr: false });
 type MqttMessage = {
   device: string;
   metric: string;
@@ -65,8 +67,6 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
 
   // live reference
 
-  const [chartTypes, setChartTypes] = useState<Record<string, string>>({});
-
   const selectedDeviceRef = useRef(selectedDevice);
 
   useEffect(() => {
@@ -118,6 +118,19 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
   function applyDeviceFilter() {
     setSelectedDevice(deviceInput.trim());
     setData([]);
+  }
+
+  function sendControlCommand(device: string, command: string) {
+    if (socket && connected) {
+      socket.send(JSON.stringify({
+        action: "command",
+        device,
+        command,
+        timestamp: new Date().toISOString()
+      }));
+    } else {
+      console.warn("WebSocket is not connected.");
+    }
   }
 
   function downloadCSV() {
@@ -290,139 +303,101 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
       {/* Metric Charts */}
       {metricsToDisplay.length > 0 && (
         <div className="flex flex-col gap-6 w-full mt-4 mb-2">
-
           {metricsToDisplay.map((metric) => {
             const chartData = selectedDevice
-              ? data.filter(d => d.metric && d.metric.toLowerCase() === metric.toLowerCase())
-              : [];
+              ? data.filter(d => d.device === selectedDevice && d.metric && d.metric.toLowerCase() === metric.toLowerCase())
+              : data.filter(d => d.metric && d.metric.toLowerCase() === metric.toLowerCase());
 
             const currentChartType = chartTypes[metric] || "line";
-            {/* CHARTS */ }
-            {
-              metricsToDisplay.map((metric) => {
-                const chartData = data.filter(d => d.metric === metric);
-                const type = chartTypes[metric] || "line";
 
-                return (
-                  <div key={metric} className="flex flex-col xl:flex-row gap-4 w-full">
-
-                    <div className="flex-1 border border-slate-300 bg-white shadow-sm p-4 min-w-0">
-
-                      {/* 🔽 Per-metric dropdown and unit input */}
-                      <div className="flex items-center gap-4 mb-3">
-                        <div className="flex items-center gap-2">
-                          <label className="text-sm font-medium">Graph Type:</label>
-                          <select
-                            value={currentChartType}
-                            onChange={(e) => {
-                              const value = e.target.value as ChartType;
-
-                              setChartTypes(prev => ({
-                                ...prev,
-                                [metric]: value
-                              }));
-                            }}
-                            className="border border-slate-300 rounded px-2 py-1 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#003366]"
-                          >
-                            <option value="line">Line</option>
-                            <option value="gauge">Gauge</option>
-                            <option value="dial">Dial</option>
-                            <option value="bar">Bar</option>
-                            <option value="area">Area</option>
-                            <option value="scatter">Scatter</option>
-                          </select>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <label className="text-sm font-medium">Unit:</label>
-                          <input
-                            type="text"
-                            placeholder="e.g. °C, V"
-                            value={chartUnits[metric] || ""}
-                            onChange={(e) => {
-                              setChartUnits(prev => ({
-                                ...prev,
-                                [metric]: e.target.value
-                              }));
-                            }}
-                            className="border border-slate-300 rounded px-2 py-1 w-24 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#003366]"
-                          />
-                        </div>
-                      </div>
-                      return (
-                      <div key={metric} className="flex gap-4">
-                        <div className="flex-1 bg-white p-4 border">
-                          <select
-                            onChange={(e) =>
-                              setChartTypes(prev => ({
-                                ...prev,
-                                [metric]: e.target.value
-                              }))
-                            }
-                          >
-                            <option value="line">Line</option>
-                            <option value="gauge">Gauge</option>
-                            <option value="dial">Dial</option>
-                            <option value="bar">Bar</option>
-                            <option value="area">Area</option>
-                            <option value="scatter">Scatter</option>
-                          </select>
-
-                          {type === "line" && <MetricLineChart metric={metric} data={chartData} />}
-                          {type === "gauge" && <MetricGaugeChart metric={metric} data={chartData} />}
-                          {type === "dial" && <MetricDialChart metric={metric} data={chartData} />}
-                        </div>
-
-                        {currentChartType === "line" && (
-                          <MetricLineChart metric={metric} data={chartData} unit={chartUnits[metric]} />
-                        )}
-
-                        {currentChartType === "gauge" && (
-                          <MetricGaugeChart metric={metric} data={chartData} unit={chartUnits[metric]} />
-                        )}
-
-                        {currentChartType === "dial" && (
-                          <MetricDialChart metric={metric} data={chartData} unit={chartUnits[metric]} />
-                        )}
-
-                        {currentChartType === "area" && (
-                          <MetricAreaChart metric={metric} data={chartData} />
-                        )}
-
-                        {currentChartType === "bar" && (
-                          <MetricBarChart metric={metric} data={chartData} />
-                        )}
-
-                        {currentChartType === "scatter" && (
-                          <MetricScatterChart metric={metric} data={chartData} />
-                        )}
-
-                      </div>
-
-                      <div className="w-full xl:w-64 shrink-0 border border-slate-300 bg-white shadow-sm p-4 flex flex-col justify-center">
-                        <MetricStats data={chartData} />
-                      </div>
-
+            return (
+              <div key={metric} className="flex flex-col xl:flex-row gap-4 w-full">
+                <div className="flex-1 border border-slate-300 bg-white shadow-sm p-4 min-w-0">
+                  <div className="flex items-center gap-4 mb-3">
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm font-medium">Graph Type:</label>
+                      <select
+                        value={currentChartType}
+                        onChange={(e) => {
+                          const value = e.target.value as ChartType;
+                          setChartTypes(prev => ({
+                            ...prev,
+                            [metric]: value
+                          }));
+                        }}
+                        className="border border-slate-300 rounded px-2 py-1 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#003366]"
+                      >
+                        <option value="line">Line</option>
+                        <option value="gauge">Gauge</option>
+                        <option value="dial">Dial</option>
+                        <option value="bar">Bar</option>
+                        <option value="area">Area</option>
+                        <option value="scatter">Scatter</option>
+                      </select>
                     </div>
-                    );
-          })}
-                    <div className="w-64 bg-white p-4 border">
-                      <MetricStats data={chartData} />
+
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm font-medium">Unit:</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. °C, V"
+                        value={chartUnits[metric] || ""}
+                        onChange={(e) => {
+                          setChartUnits(prev => ({
+                            ...prev,
+                            [metric]: e.target.value
+                          }));
+                        }}
+                        className="border border-slate-300 rounded px-2 py-1 w-24 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#003366]"
+                      />
                     </div>
                   </div>
-                );
-              })
-            }
 
-            {/* TERMINAL */ }
-            <div className="bg-black text-white p-4 h-60 overflow-y-auto">
-              {data.map((d, i) => (
-                <div key={i}>
-                  [{d.device}] {d.metric}: {d.value}
+                  {currentChartType === "line" && (
+                    <MetricLineChart metric={metric} data={chartData} />
+                  )}
+
+                  {currentChartType === "gauge" && (
+                    <MetricGaugeChart metric={metric} data={chartData} />
+                  )}
+
+                  {currentChartType === "dial" && (
+                    <MetricDialChart metric={metric} data={chartData} />
+                  )}
+
+                  {currentChartType === "area" && (
+                    <MetricAreaChart metric={metric} data={chartData} />
+                  )}
+
+                  {currentChartType === "bar" && (
+                    <MetricBarChart metric={metric} data={chartData} />
+                  )}
+
+                  {currentChartType === "scatter" && (
+                    <MetricScatterChart metric={metric} data={chartData} />
+                  )}
                 </div>
-              ))}
-            </div>
 
+                <div className="w-full xl:w-64 shrink-0 border border-slate-300 bg-white shadow-sm p-4 flex flex-col justify-center">
+                  <MetricStats data={chartData} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* TERMINAL */}
+      <div className="bg-black text-white p-4 h-60 overflow-y-auto mb-6">
+        {data.length === 0 && <span className="text-slate-500 italic text-sm">No data received yet...</span>}
+        {data.map((d, i) => (
+          <div key={i} className="text-sm font-mono opacity-80 hover:opacity-100 transition-opacity">
+            <span className="text-slate-400">[{new Date(d.timestamp).toLocaleTimeString()}]</span>{" "}
+            <span className="text-emerald-300">[{d.device}]</span>{" "}
+            <span className="text-blue-300">{d.metric}:</span> {d.value}
+          </div>
+        ))}
+      </div>
     </div>
-      );
+  );
 }

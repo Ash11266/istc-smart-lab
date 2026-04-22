@@ -1,9 +1,10 @@
-"use client";
+
 
 import Link from "next/link";
 import ExperimentStream from "./ExperimentStream";
 import AIChat from "@/components/AIChat";
 import { cookies } from "next/headers";
+import CollapsibleSidebar from "./CollapsibleSidebar";
 
 export default async function ExperimentPage({
   params,
@@ -68,43 +69,15 @@ export default async function ExperimentPage({
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex flex-1 h-full min-h-0">
 
-      {/* 🔷 LEFT SIDEBAR */}
-      <div className="w-1/4 bg-[#d6eaf8] border-r-4 border-orange-400 p-4 flex flex-col">
-        <h2 className="text-xl font-semibold mb-4 text-[#154360]">
-          Experiments
-        </h2>
-
-        <div className="flex-1 overflow-y-auto space-y-2">
-          {experiments.map((exp) => (
-            <Link
-              key={exp.uuid}
-              href={`/experiments/${exp.uuid}`}
-              className={`p-3 rounded-lg block transition shadow-sm ${id === exp.uuid
-                ? "bg-orange-200 border-l-4 border-orange-500"
-                : "bg-white hover:bg-blue-50"
-                }`}
-            >
-              <div className="flex flex-col">
-                <p className="font-medium text-[#2c3e50]">
-                  {exp.name}
-                </p>
-                {!!exp.is_private && (
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 bg-slate-200 px-1.5 py-0.5 rounded mt-1 w-fit">
-                    Private
-                  </span>
-                )}
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
+      {/* 🔷 LEFT COLLAPSIBLE SIDEBAR */}
+      <CollapsibleSidebar experiments={allExperiments} activeId={id} isLoggedIn={!!sessionCookie} />
 
       {/* 🔷 RIGHT CONTENT */}
       <div className="flex-1 overflow-y-auto bg-gradient-to-br from-[#f0fbfa]/80 to-white/80 backdrop-blur-sm">
 
-        <div className="max-w-6xl mx-auto py-8 px-6">
+        <div className="max-w-6xl mx-auto py-8 px-12">
 
           {/* HEADER */}
           <div className="mb-6 border-b-2 border-slate-300 pb-4">
