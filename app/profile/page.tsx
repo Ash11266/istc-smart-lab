@@ -34,32 +34,32 @@ export default async function ProfilePage() {
     <div className="flex flex-col gap-8 max-w-2xl mx-auto">
 
       {/* Profile Header Block */}
-      <div className="bg-[#003366] text-white p-6 rounded-lg shadow-sm border-l-4 border-amber-500 flex justify-between items-start">
+      <div className="bg-[#166534] text-white p-6 rounded-lg shadow-sm border-l-4 border-amber-500 flex justify-between items-start">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight">Your Profile</h1>
-          <p className="mt-2 text-slate-300">Manage your account credentials.</p>
+          <p className="mt-2 text-green-300">Manage your account credentials.</p>
         </div>
         <LogoutButton />
       </div>
 
       {/* Account Info Block */}
-      <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-slate-200">
-        <h2 className="text-xl font-bold text-slate-800 mb-6 border-b pb-2">Account details</h2>
+      <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-green-200">
+        <h2 className="text-xl font-bold text-green-800 mb-6 border-b pb-2">Account details</h2>
 
         <div className="space-y-4">
           <div>
-            <span className="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Full Name</span>
-            <span className="text-slate-900 font-medium text-lg">{user.name}</span>
+            <span className="block text-green-500 text-xs font-bold uppercase tracking-wider mb-1">Full Name</span>
+            <span className="text-green-900 font-medium text-lg">{user.name}</span>
           </div>
 
           <div>
-            <span className="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Email / Username</span>
-            <span className="text-slate-900 font-medium text-lg">{user.email}</span>
+            <span className="block text-green-500 text-xs font-bold uppercase tracking-wider mb-1">Email / Username</span>
+            <span className="text-green-900 font-medium text-lg">{user.email}</span>
           </div>
 
           <div>
-            <span className="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Role Type</span>
-            <span className="inline-flex py-1 px-3 mt-1 rounded text-sm font-semibold bg-slate-100 text-[#003366] border border-slate-300">
+            <span className="block text-green-500 text-xs font-bold uppercase tracking-wider mb-1">Role Type</span>
+            <span className="inline-flex py-1 px-3 mt-1 rounded text-sm font-semibold bg-green-100 text-[#166534] border border-green-300">
               {user.is_admin ? "Administrator" : "User"}
             </span>
           </div>

@@ -42,7 +42,7 @@ export default async function ExperimentPage({
 
   if (isForbidden) {
     return (
-      <div className="max-w-2xl mx-auto py-24 px-4 text-center text-slate-900">
+      <div className="max-w-2xl mx-auto py-24 px-4 text-center text-green-900">
         <div className="bg-white border-2 border-red-700 p-8 shadow-sm">
           <h2 className="text-2xl font-bold mb-2 text-red-700">
             Access Denied
@@ -58,7 +58,7 @@ export default async function ExperimentPage({
 
   if (!experiment) {
     return (
-      <div className="max-w-2xl mx-auto py-24 px-4 text-center text-slate-900">
+      <div className="max-w-2xl mx-auto py-24 px-4 text-center text-green-900">
         <div className="bg-white border-2 border-red-700 p-8 shadow-sm">
           <h2 className="text-2xl font-bold mb-2 text-red-700">
             Record Not Found
@@ -90,7 +90,7 @@ export default async function ExperimentPage({
               href={`/experiments/${exp.uuid}`}
               className={`p-3 rounded-lg block transition shadow-sm ${id === exp.uuid
                 ? "bg-orange-200 border-l-4 border-orange-500"
-                : "bg-white hover:bg-blue-50"
+                : "bg-white hover:bg-green-50"
                 }`}
             >
               <div className="flex flex-col">
@@ -98,7 +98,7 @@ export default async function ExperimentPage({
                   {exp.name}
                 </p>
                 {!!exp.is_private && (
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 bg-slate-200 px-1.5 py-0.5 rounded mt-1 w-fit">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-green-500 bg-green-200 px-1.5 py-0.5 rounded mt-1 w-fit">
                     Private
                   </span>
                 )}
@@ -112,13 +112,13 @@ export default async function ExperimentPage({
 
       {/* 🔷 RIGHT CONTENT */}
       <div className="flex-1 overflow-y-auto h-full bg-[#f4f9fd]">
-        <div className="max-w-6xl mx-auto w-full py-8 px-6 text-slate-900">
+        <div className="max-w-6xl mx-auto w-full py-8 px-6 text-green-900">
 
           {/* HEADER */}
-          <div className="mb-6 border-b-2 border-slate-300 pb-4">
+          <div className="mb-6 border-b-2 border-green-300 pb-4">
             <Link
               href="/experiments"
-              className="inline-flex items-center text-sm font-bold text-[#003366] hover:underline mb-4 uppercase tracking-wider"
+              className="inline-flex items-center text-sm font-bold text-[#166534] hover:underline mb-4 uppercase tracking-wider"
             >
               Back to Directory
             </Link>

@@ -21,10 +21,11 @@ type MqttMessage = {
 };
 
 export default function ExperimentStream({ dataValues }: { dataValues?: string }) {
-  // Parse allowed metrics
-  const allowedMetrics = dataValues
-    ? dataValues.split(",").map(v => v.trim().toLowerCase()).filter(Boolean)
-    : [];
+  const allowedMetrics = useMemo(() => {
+    return dataValues
+      ? dataValues.split(",").map(v => v.trim().toLowerCase()).filter(Boolean)
+      : [];
+  }, [dataValues]);
 
   const [data, setData] = useState<MqttMessage[]>([]);
   const [connected, setConnected] = useState(false);
@@ -50,8 +51,11 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
     const saved = localStorage.getItem("smartlab_custom_buttons");
     if (saved) {
       try {
-        setCustomButtons(JSON.parse(saved));
-      } catch (e) { }
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setCustomButtons(parsed);
+        }
+      } catch { }
     }
   }, []);
 
@@ -78,16 +82,19 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
 
   // Determine active metrics
   const metricsToDisplay = useMemo(() => {
-    if (allowedMetrics.length > 0) return allowedMetrics;
-    const unique = new Set(data.map(d => d.metric));
-    return Array.from(unique).filter(Boolean);
+    const dataMetrics = new Set(data.map(d => d.metric?.toLowerCase()).filter(Boolean));
+    if (allowedMetrics.length > 0) {
+      return allowedMetrics.filter(m => dataMetrics.has(m));
+    }
+    return Array.from(new Set(data.map(d => d.metric).filter(Boolean)));
   }, [data, allowedMetrics]);
 
   function connect() {
     if (connected) return;
 
+    const wsHost = process.env.NEXT_PUBLIC_WS_HOST === 'localhost' ? window.location.hostname : process.env.NEXT_PUBLIC_WS_HOST;
     const ws = new WebSocket(
-      `ws://${process.env.NEXT_PUBLIC_WS_HOST}:${process.env.NEXT_PUBLIC_WS_PORT}${process.env.NEXT_PUBLIC_WS_PATH}`
+      `ws://${wsHost}:${process.env.NEXT_PUBLIC_WS_PORT}${process.env.NEXT_PUBLIC_WS_PATH}`
     );
 
     ws.onopen = () => {
@@ -99,20 +106,20 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
       try {
         const raw = JSON.parse(event.data);
 
-        const extractStringOrValue = (obj: any): string => {
+        const extractStringOrValue = (obj: unknown): string => {
           if (obj === null || obj === undefined) return "";
           if (typeof obj === 'object') {
-            return 'value' in obj ? String(obj.value) : JSON.stringify(obj);
+            return 'value' in obj ? String((obj as Record<string, unknown>).value) : JSON.stringify(obj);
           }
           return String(obj);
         };
 
-        const extractValue = (obj: any): number | string => {
+        const extractValue = (obj: unknown): number | string => {
           if (obj === null || obj === undefined) return "";
           if (typeof obj === 'object') {
-            return 'value' in obj ? obj.value : JSON.stringify(obj);
+            return 'value' in obj ? (obj as Record<string, unknown>).value as string | number : JSON.stringify(obj);
           }
-          return obj;
+          return obj as string | number;
         };
 
         const message: MqttMessage = {
@@ -158,7 +165,8 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
 
   const sendControlCommand = (device: string, action: string) => {
     try {
-      const host = (process.env.NEXT_PUBLIC_WS_HOST || '').trim();
+      const envHost = (process.env.NEXT_PUBLIC_WS_HOST || '').trim();
+      const host = envHost === 'localhost' ? window.location.hostname : envHost;
       const port = (process.env.NEXT_PUBLIC_WS_PORT || '').trim();
       const path = (process.env.NEXT_PUBLIC_WS_CONTROL_PATH || '').trim();
       const wsControlUrl = `ws://${host}:${port}${path}`;
@@ -204,18 +212,18 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
   if (isAuthenticated === null) {
     return (
       <div className="flex justify-center p-12">
-        <div className="animate-spin h-8 w-8 border-4 border-[#003366] border-t-transparent rounded-full"></div>
+        <div className="animate-spin h-8 w-8 border-4 border-[#166534] border-t-transparent rounded-full"></div>
       </div>
     );
   }
 
   if (isAuthenticated === false) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 text-slate-500 border-2 border-dashed border-slate-300 gap-4 mt-4">
-        <svg className="w-16 h-16 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-        <span className="uppercase tracking-widest font-bold text-lg text-slate-700">Authentication Required</span>
+      <div className="flex flex-col items-center justify-center p-12 text-green-500 border-2 border-dashed border-green-300 gap-4 mt-4">
+        <svg className="w-16 h-16 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+        <span className="uppercase tracking-widest font-bold text-lg text-green-700">Authentication Required</span>
         <p className="text-center font-medium max-w-md">You must be logged in to connect to the telemetry stream and view real-time data from devices.</p>
-        <a href="/login" className="mt-2 text-center px-6 py-2.5 font-bold uppercase tracking-wide text-sm transition-colors border-2 shadow-sm bg-[#003366] border-[#003366] hover:bg-slate-900 text-white">
+        <a href="/login" className="mt-2 text-center px-6 py-2.5 font-bold uppercase tracking-wide text-sm transition-colors border-2 shadow-sm bg-[#166534] border-[#166534] hover:bg-green-900 text-white">
           Log In Now
         </a>
       </div>
@@ -223,7 +231,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
   }
 
   return (
-    <div className="flex flex-col gap-6 w-full text-slate-900">
+    <div className="flex flex-col gap-6 w-full text-green-900">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 
         <div className="flex items-center gap-3 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0">
@@ -231,8 +239,8 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
             onClick={downloadCSV}
             disabled={data.length === 0}
             className={`flex items-center gap-2 px-6 py-2.5 font-bold uppercase tracking-wide text-sm transition-colors border-2 shadow-sm ${data.length === 0
-              ? "bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed"
-              : "bg-white border-[#003366] text-[#003366] hover:bg-slate-50"
+              ? "bg-green-100 border-green-300 text-green-400 cursor-not-allowed"
+              : "bg-white border-[#166534] text-[#166534] hover:bg-green-50"
               }`}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
@@ -243,8 +251,8 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
             onClick={connect}
             disabled={connected}
             className={`relative px-6 py-2.5 font-bold uppercase tracking-wide text-sm transition-colors border-2 shadow-sm ${connected
-              ? "bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed"
-              : "bg-[#003366] border-[#003366] hover:bg-slate-900 text-white"
+              ? "bg-green-100 border-green-300 text-green-400 cursor-not-allowed"
+              : "bg-[#166534] border-[#166534] hover:bg-green-900 text-white"
               }`}
           >
             {connected && (
@@ -260,7 +268,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
             onClick={disconnect}
             disabled={!connected}
             className={`px-6 py-2.5 font-bold uppercase tracking-wide text-sm transition-colors border-2 shadow-sm ${!connected
-              ? "bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed"
+              ? "bg-green-100 border-green-300 text-green-400 cursor-not-allowed"
               : "bg-red-700 border-red-700 hover:bg-red-800 text-white"
               }`}
           >
@@ -270,51 +278,51 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="md:col-span-2 bg-slate-50 p-4 border border-slate-300 flex flex-col justify-center">
+        <div className="md:col-span-2 bg-green-50 p-4 border border-green-300 flex flex-col justify-center">
           <div className="flex gap-2">
             <input
               type="text"
               value={deviceInput}
               onChange={(e) => setDeviceInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && applyDeviceFilter()}
-              className="flex-1 px-4 py-2 border border-slate-400 bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#003366] focus:border-[#003366]"
+              className="flex-1 px-4 py-2 border border-green-400 bg-white text-green-900 placeholder-green-500 focus:outline-none focus:ring-2 focus:ring-[#166534] focus:border-[#166534]"
               placeholder="Filter by device identifier..."
             />
             <button
               onClick={applyDeviceFilter}
-              className="px-6 py-2 bg-[#003366] hover:bg-slate-900 text-white text-sm font-bold uppercase tracking-wider transition-colors shadow-sm"
+              className="px-6 py-2 bg-[#166534] hover:bg-green-900 text-white text-sm font-bold uppercase tracking-wider transition-colors shadow-sm"
             >
               Apply Filter
             </button>
           </div>
         </div>
 
-        <div className="bg-slate-50 p-4 border border-slate-300 flex flex-col justify-center items-center text-center">
-          <span className="text-xs uppercase tracking-widest text-slate-600 font-bold mb-1">Active Filter</span>
-          <span className="text-lg font-bold text-[#003366] truncate w-full">{selectedDevice || "NO DEVICE SELECTED"}</span>
+        <div className="bg-green-50 p-4 border border-green-300 flex flex-col justify-center items-center text-center">
+          <span className="text-xs uppercase tracking-widest text-green-600 font-bold mb-1">Active Filter</span>
+          <span className="text-lg font-bold text-[#166534] truncate w-full">{selectedDevice || "NO DEVICE SELECTED"}</span>
         </div>
       </div>
 
       <div className="flex flex-col mt-2 gap-4">
-        <div className="bg-slate-50 p-4 border border-slate-300 flex flex-col justify-center items-center gap-3 text-center">
-          <span className="text-xl font-bold text-[#003366]">Control Tools</span>
+        <div className="bg-green-50 p-4 border border-green-300 flex flex-col justify-center items-center gap-3 text-center">
+          <span className="text-xl font-bold text-[#166534]">Control Tools</span>
 
-          <div className="text-sm font-medium text-slate-600">
-            Target Device: <span className="font-bold text-slate-900">{selectedDevice || (data.length > 0 ? data[data.length - 1].device : "None")}</span>
+          <div className="text-sm font-medium text-green-600">
+            Target Device: <span className="font-bold text-green-900">{selectedDevice || (data.length > 0 ? data[data.length - 1].device : "None")}</span>
           </div>
 
           <div className="flex gap-3 mt-2 flex-wrap justify-center items-center">
             <button
               onClick={() => sendControlCommand(selectedDevice || (data.length > 0 ? data[data.length - 1].device : ""), "start")}
               disabled={!selectedDevice && data.length === 0}
-              className={`px-8 py-2 text-white text-sm font-bold uppercase tracking-wider transition-colors shadow-sm ${(!selectedDevice && data.length === 0) ? "bg-slate-300 cursor-not-allowed" : "bg-emerald-600 hover:bg-emerald-700"}`}
+              className={`px-8 py-2 text-white text-sm font-bold uppercase tracking-wider transition-colors shadow-sm ${(!selectedDevice && data.length === 0) ? "bg-green-300 cursor-not-allowed" : "bg-emerald-600 hover:bg-emerald-700"}`}
             >
               Start
             </button>
             <button
               onClick={() => sendControlCommand(selectedDevice || (data.length > 0 ? data[data.length - 1].device : ""), "stop")}
               disabled={!selectedDevice && data.length === 0}
-              className={`px-8 py-2 text-white text-sm font-bold uppercase tracking-wider transition-colors shadow-sm ${(!selectedDevice && data.length === 0) ? "bg-slate-300 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"}`}
+              className={`px-8 py-2 text-white text-sm font-bold uppercase tracking-wider transition-colors shadow-sm ${(!selectedDevice && data.length === 0) ? "bg-green-300 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"}`}
             >
               Stop
             </button>
@@ -325,7 +333,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
                 <button
                   onClick={() => sendControlCommand(selectedDevice || (data.length > 0 ? data[data.length - 1].device : ""), btn.message)}
                   disabled={!selectedDevice && data.length === 0}
-                  className={`px-8 py-2 text-[#003366] bg-white border-2 border-[#003366] text-sm font-bold uppercase tracking-wider transition-colors shadow-sm ${(!selectedDevice && data.length === 0) ? "opacity-50 cursor-not-allowed" : "hover:bg-slate-100"}`}
+                  className={`px-8 py-2 text-[#166534] bg-white border-2 border-[#166534] text-sm font-bold uppercase tracking-wider transition-colors shadow-sm ${(!selectedDevice && data.length === 0) ? "opacity-50 cursor-not-allowed" : "hover:bg-green-100"}`}
                 >
                   {btn.label}
                 </button>
@@ -342,7 +350,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
               </div>
             ))}
 
-            <div className="flex gap-2 border-l-2 border-slate-300 pl-3 ml-1 h-full items-center">
+            <div className="flex gap-2 border-l-2 border-green-300 pl-3 ml-1 h-full items-center">
               <input
                 type="text"
                 value={customCommand}
@@ -354,7 +362,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
                   }
                 }}
                 placeholder="Custom command..."
-                className="px-3 py-2 border border-slate-400 bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#003366] w-36 sm:w-56 shadow-sm"
+                className="px-3 py-2 border border-green-400 bg-white text-green-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#166534] w-36 sm:w-56 shadow-sm"
                 disabled={!selectedDevice && data.length === 0}
               />
               <button
@@ -365,14 +373,14 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
                   }
                 }}
                 disabled={(!selectedDevice && data.length === 0) || !customCommand.trim()}
-                className={`px-6 py-2 text-white text-sm font-bold uppercase tracking-wider transition-colors shadow-sm ${(!selectedDevice && data.length === 0) || !customCommand.trim() ? "bg-slate-300 cursor-not-allowed" : "bg-[#003366] hover:bg-slate-900"}`}
+                className={`px-6 py-2 text-white text-sm font-bold uppercase tracking-wider transition-colors shadow-sm ${(!selectedDevice && data.length === 0) || !customCommand.trim() ? "bg-green-300 cursor-not-allowed" : "bg-[#166534] hover:bg-green-900"}`}
               >
                 Send
               </button>
 
               <button
                 onClick={() => setIsAddingButton(!isAddingButton)}
-                className={`px-4 py-2 text-sm font-bold uppercase tracking-wider transition-colors shadow-sm ${isAddingButton ? "bg-slate-700 text-white" : "bg-slate-200 hover:bg-slate-300 text-slate-800"}`}
+                className={`px-4 py-2 text-sm font-bold uppercase tracking-wider transition-colors shadow-sm ${isAddingButton ? "bg-green-700 text-white" : "bg-green-200 hover:bg-green-300 text-green-800"}`}
                 title={isAddingButton ? "Cancel creating custom button" : "Create a reusable custom button"}
               >
                 {isAddingButton ? "×" : "+"}
@@ -381,14 +389,14 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
           </div>
 
           {isAddingButton && (
-            <div className="flex gap-3 mt-4 p-4 bg-white border-2 border-[#003366] w-full justify-center items-center shadow-md animate-in fade-in slide-in-from-top-2">
-              <span className="text-sm font-bold uppercase text-[#003366]">New Button:</span>
+            <div className="flex gap-3 mt-4 p-4 bg-white border-2 border-[#166534] w-full justify-center items-center shadow-md animate-in fade-in slide-in-from-top-2">
+              <span className="text-sm font-bold uppercase text-[#166534]">New Button:</span>
               <input
                 type="text"
                 placeholder="Label (e.g. Calibrate)"
                 value={newBtnLabel}
                 onChange={e => setNewBtnLabel(e.target.value)}
-                className="px-3 py-2 border border-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#003366]"
+                className="px-3 py-2 border border-green-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#166534]"
               />
               <input
                 type="text"
@@ -403,7 +411,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
                     setIsAddingButton(false);
                   }
                 }}
-                className="px-3 py-2 border border-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#003366]"
+                className="px-3 py-2 border border-green-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#166534]"
               />
               <button
                 onClick={() => {
@@ -415,7 +423,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
                   }
                 }}
                 disabled={!newBtnLabel || !newBtnMessage}
-                className={`px-6 py-2 text-white text-sm font-bold uppercase tracking-wider transition-colors shadow-sm ${(!newBtnLabel || !newBtnMessage) ? "bg-slate-400 cursor-not-allowed" : "bg-emerald-600 hover:bg-emerald-700"}`}
+                className={`px-6 py-2 text-white text-sm font-bold uppercase tracking-wider transition-colors shadow-sm ${(!newBtnLabel || !newBtnMessage) ? "bg-green-400 cursor-not-allowed" : "bg-emerald-600 hover:bg-emerald-700"}`}
               >
                 Save
               </button>
@@ -429,16 +437,14 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
         <div className="flex flex-col gap-6 w-full mt-4 mb-2">
 
           {metricsToDisplay.map((metric) => {
-            const chartData = selectedDevice
-              ? data.filter(d => d.metric && d.metric.toLowerCase() === metric.toLowerCase())
-              : [];
+            const chartData = data.filter(d => d.metric && d.metric.toLowerCase() === metric.toLowerCase());
 
             const currentChartType = chartTypes[metric] || "line";
 
             return (
               <div key={metric} className="flex flex-col xl:flex-row gap-4 w-full">
 
-                <div className="flex-1 border border-slate-300 bg-white shadow-sm p-4 min-w-0">
+                <div className="flex-1 border border-green-300 bg-white shadow-sm p-4 min-w-0">
 
                   {/* 🔽 Per-metric dropdown and unit input */}
                   <div className="flex items-center gap-4 mb-3">
@@ -454,7 +460,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
                             [metric]: value
                           }));
                         }}
-                        className="border border-slate-300 rounded px-2 py-1 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#003366]"
+                        className="border border-green-300 rounded px-2 py-1 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#166534]"
                       >
                         <option value="line">Line</option>
                         <option value="gauge">Gauge</option>
@@ -477,7 +483,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
                             [metric]: e.target.value
                           }));
                         }}
-                        className="border border-slate-300 rounded px-2 py-1 w-24 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#003366]"
+                        className="border border-green-300 rounded px-2 py-1 w-24 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#166534]"
                       />
                     </div>
                   </div>
@@ -508,7 +514,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
 
                 </div>
 
-                <div className="w-full xl:w-64 shrink-0 border border-slate-300 bg-white shadow-sm p-4 flex flex-col justify-center">
+                <div className="w-full xl:w-64 shrink-0 border border-green-300 bg-white shadow-sm p-4 flex flex-col justify-center">
                   <MetricStats data={chartData} />
                 </div>
 
@@ -519,20 +525,20 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
         </div>
       )}
 
-      <div className="bg-black border-2 border-slate-800 flex flex-col h-[400px]">
-        <div className="bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between">
+      <div className="bg-black border-2 border-green-800 flex flex-col h-[400px]">
+        <div className="bg-green-900 border-b border-green-800 px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className={`w-3 h-3 ${connected ? 'bg-emerald-500 animate-pulse' : 'bg-red-600'}`}></span>
             <span className="text-white font-mono text-xs font-bold uppercase tracking-widest">Stream Output</span>
           </div>
-          <div className="text-slate-400 font-mono text-xs font-bold uppercase">
+          <div className="text-green-400 font-mono text-xs font-bold uppercase">
             {data.length} Messages
           </div>
         </div>
 
         <div className="p-4 overflow-y-auto font-mono text-xs sm:text-sm leading-relaxed flex-1 flex flex-col gap-1 custom-scrollbar">
           {data.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-slate-500 gap-2 opacity-70">
+            <div className="h-full flex flex-col items-center justify-center text-green-500 gap-2 opacity-70">
               <svg className="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
               <span className="uppercase tracking-widest font-bold">{connected ? "WAITING FOR DATA SEQUENCE..." : "SYSTEM DISCONNECTED - CONNECT TO START"}</span>
             </div>
@@ -540,9 +546,9 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
             data.map((d, i) => (
               <div
                 key={i}
-                className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4 hover:bg-slate-900 p-1.5 transition-colors border-b border-slate-900"
+                className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4 hover:bg-green-900 p-1.5 transition-colors border-b border-green-900"
               >
-                <div className="text-slate-500 shrink-0 font-bold whitespace-nowrap">
+                <div className="text-green-500 shrink-0 font-bold whitespace-nowrap">
                   {d.timestamp ? new Date(d.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString()}
                 </div>
                 <div className="flex-1 break-all">

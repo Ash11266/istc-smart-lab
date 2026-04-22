@@ -42,7 +42,7 @@ export default function AIBox({
   return (
     <div className="bg-white border p-6 flex flex-col h-full shrink-0">
       {/* Title */}
-      <h2 className="text-xl font-bold mb-4 text-[#003366]">
+      <h2 className="text-xl font-bold mb-4 text-[#166534]">
       Experiment Insights
       </h2>
 
@@ -53,8 +53,8 @@ export default function AIBox({
     disabled={loading}
     className={`flex items-center justify-center gap-2 w-full px-5 py-3 font-semibold text-white transition tracking-wide uppercase text-sm
       ${loading 
-        ? "bg-slate-400 cursor-not-allowed" 
-        : "bg-[#003366] hover:bg-[#002244]"}
+        ? "bg-green-400 cursor-not-allowed" 
+        : "bg-[#166534] hover:bg-[#14532d]"}
     `}
   >
     {loading ? (
@@ -74,8 +74,8 @@ export default function AIBox({
 
       {/* Output */}
       {aiText && (
-        <div className="mt-4 p-4 bg-slate-50 border border-slate-200 shadow-sm flex-1 overflow-y-auto">
-          <p className="whitespace-pre-line text-slate-800 leading-relaxed max-w-prose">{aiText}</p>
+        <div className="mt-4 p-4 bg-green-50 border border-green-200 shadow-sm flex-1 overflow-y-auto">
+          <p className="whitespace-pre-line text-green-800 leading-relaxed max-w-prose">{aiText}</p>
         </div>
       )}
     </div>

@@ -55,8 +55,8 @@ export default function PasswordChangeForm() {
   };
 
   return (
-    <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-slate-200 mt-8">
-      <h2 className="text-xl font-bold text-slate-800 mb-6 border-b pb-2">Change Password</h2>
+    <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-green-200 mt-8">
+      <h2 className="text-xl font-bold text-green-800 mb-6 border-b pb-2">Change Password</h2>
       
       {error && (
         <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 text-sm flex items-center">
@@ -72,24 +72,24 @@ export default function PasswordChangeForm() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-slate-700 text-sm font-bold mb-2 tracking-wider">Current Password</label>
+          <label className="block text-green-700 text-sm font-bold mb-2 tracking-wider">Current Password</label>
           <input
             type="password"
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-300 rounded px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/50 focus:border-[#003366]"
+            className="w-full bg-green-50 border border-green-300 rounded px-4 py-3 text-green-900 placeholder-green-400 focus:outline-none focus:ring-2 focus:ring-[#166534]/50 focus:border-[#166534]"
             placeholder="••••••••"
             required
           />
         </div>
 
         <div>
-          <label className="block text-slate-700 text-sm font-bold mb-2 tracking-wider">New Password</label>
+          <label className="block text-green-700 text-sm font-bold mb-2 tracking-wider">New Password</label>
           <input
             type="password"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-300 rounded px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/50 focus:border-[#003366]"
+            className="w-full bg-green-50 border border-green-300 rounded px-4 py-3 text-green-900 placeholder-green-400 focus:outline-none focus:ring-2 focus:ring-[#166534]/50 focus:border-[#166534]"
             placeholder="••••••••"
             required
             minLength={6}
@@ -97,12 +97,12 @@ export default function PasswordChangeForm() {
         </div>
         
         <div>
-          <label className="block text-slate-700 text-sm font-bold mb-2 tracking-wider">Confirm New Password</label>
+          <label className="block text-green-700 text-sm font-bold mb-2 tracking-wider">Confirm New Password</label>
           <input
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-300 rounded px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#003366]/50 focus:border-[#003366]"
+            className="w-full bg-green-50 border border-green-300 rounded px-4 py-3 text-green-900 focus:outline-none focus:ring-2 focus:ring-[#166534]/50 focus:border-[#166534]"
             placeholder="••••••••"
             required
             minLength={6}
@@ -112,7 +112,7 @@ export default function PasswordChangeForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-[#003366] hover:bg-slate-900 text-white font-bold py-3 px-8 rounded transition-colors disabled:opacity-50 mt-4 shadow-sm uppercase tracking-wider"
+          className="w-full bg-[#166534] hover:bg-green-900 text-white font-bold py-3 px-8 rounded transition-colors disabled:opacity-50 mt-4 shadow-sm uppercase tracking-wider"
         >
           {isLoading ? "Updating..." : "Update Password"}
         </button>

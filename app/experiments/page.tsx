@@ -70,12 +70,12 @@ export default function ExperimentsPage() {
 
           {experiments.map((exp, idx) => (
             <div key={exp.uuid || idx} onClick={() => router.push(`/experiments/${exp.uuid}`)}
-              className="group p-3 rounded-lg cursor-pointer transition-all duration-200 shadow-sm bg-white hover:bg-blue-50 flex justify-between items-center"
+              className="group p-3 rounded-lg cursor-pointer transition-all duration-200 shadow-sm bg-white hover:bg-green-50 flex justify-between items-center"
             >
               <div className="flex flex-col">
                 <p className="font-medium text-[#2c3e50]">{exp.name}</p>
                 {exp.is_private ? (
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 bg-slate-200 px-1.5 py-0.5 rounded mt-1 w-fit">Private</span>
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-green-500 bg-green-200 px-1.5 py-0.5 rounded mt-1 w-fit">Private</span>
                 ) : null}
               </div>
               {isAdmin && (

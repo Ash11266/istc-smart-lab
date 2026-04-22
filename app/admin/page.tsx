@@ -119,15 +119,15 @@ export default function AdminPanel() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="bg-[#003366] text-white p-6 rounded-lg shadow-sm border-l-4 border-amber-500">
+      <div className="bg-[#166534] text-white p-6 rounded-lg shadow-sm border-l-4 border-amber-500">
         <h1 className="text-3xl font-extrabold tracking-tight">Admin & Director Panel</h1>
-        <p className="mt-2 text-slate-300">Manage user accounts and lab accessibility.</p>
+        <p className="mt-2 text-green-300">Manage user accounts and lab accessibility.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Single User Creation */}
-        <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-slate-200">
-          <h2 className="text-xl font-bold text-slate-800 mb-6 border-b pb-2">Single User Provisioning</h2>
+        <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-green-200">
+          <h2 className="text-xl font-bold text-green-800 mb-6 border-b pb-2">Single User Provisioning</h2>
           
           {error && (
             <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 text-sm flex items-center">
@@ -143,36 +143,36 @@ export default function AdminPanel() {
 
           <form onSubmit={handleSingleSubmit} className="space-y-6">
             <div>
-              <label className="block text-slate-700 text-sm font-bold mb-2 tracking-wider">Full Name</label>
+              <label className="block text-green-700 text-sm font-bold mb-2 tracking-wider">Full Name</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/50 focus:border-[#003366]"
+                className="w-full bg-green-50 border border-green-300 rounded px-4 py-3 text-green-900 placeholder-green-400 focus:outline-none focus:ring-2 focus:ring-[#166534]/50 focus:border-[#166534]"
                 placeholder="Researcher Name"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-slate-700 text-sm font-bold mb-2 tracking-wider">Email Address</label>
+              <label className="block text-green-700 text-sm font-bold mb-2 tracking-wider">Email Address</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/50 focus:border-[#003366]"
+                className="w-full bg-green-50 border border-green-300 rounded px-4 py-3 text-green-900 placeholder-green-400 focus:outline-none focus:ring-2 focus:ring-[#166534]/50 focus:border-[#166534]"
                 placeholder="name@example.com"
                 required
               />
             </div>
             
             <div>
-              <label className="block text-slate-700 text-sm font-bold mb-2 tracking-wider">Temporary Password</label>
+              <label className="block text-green-700 text-sm font-bold mb-2 tracking-wider">Temporary Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#003366]/50 focus:border-[#003366]"
+                className="w-full bg-green-50 border border-green-300 rounded px-4 py-3 text-green-900 focus:outline-none focus:ring-2 focus:ring-[#166534]/50 focus:border-[#166534]"
                 placeholder="••••••••"
                 required
                 minLength={6}
@@ -182,7 +182,7 @@ export default function AdminPanel() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-[#003366] hover:bg-slate-900 text-white font-bold py-3 px-8 rounded transition-colors disabled:opacity-50 mt-4 shadow-sm uppercase tracking-wider"
+              className="w-full bg-[#166534] hover:bg-green-900 text-white font-bold py-3 px-8 rounded transition-colors disabled:opacity-50 mt-4 shadow-sm uppercase tracking-wider"
             >
               {isLoading ? "Provisioning..." : "Create Account"}
             </button>
@@ -190,10 +190,10 @@ export default function AdminPanel() {
         </div>
 
         {/* Bulk User Creation */}
-        <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-slate-200">
-          <h2 className="text-xl font-bold text-slate-800 mb-6 border-b pb-2">Bulk User Import (Excel)</h2>
-          <p className="text-sm text-slate-600 mb-6 font-medium bg-slate-50 p-4 border border-slate-200 rounded">
-            Upload an `.xlsx` or `.csv` file. Ensure it contains exactly two column headers: <strong className="text-[#003366]">name</strong> and <strong className="text-[#003366]">email</strong>.<br/><br/>
+        <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-green-200">
+          <h2 className="text-xl font-bold text-green-800 mb-6 border-b pb-2">Bulk User Import (Excel)</h2>
+          <p className="text-sm text-green-600 mb-6 font-medium bg-green-50 p-4 border border-green-200 rounded">
+            Upload an `.xlsx` or `.csv` file. Ensure it contains exactly two column headers: <strong className="text-[#166534]">name</strong> and <strong className="text-[#166534]">email</strong>.<br/><br/>
             All imported users will be assigned the default password: <code className="bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-mono">istc@12345</code>
           </p>
 
@@ -211,12 +211,12 @@ export default function AdminPanel() {
 
           <form onSubmit={handleBulkSubmit} className="space-y-6">
             <div>
-              <label className="block text-slate-700 text-sm font-bold mb-2 tracking-wider">Select File</label>
+              <label className="block text-green-700 text-sm font-bold mb-2 tracking-wider">Select File</label>
               <input
                 type="file"
                 accept=".xlsx, .xls, .csv"
                 onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
-                className="w-full bg-slate-50 border border-slate-300 rounded px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-[#003366] file:text-white hover:file:bg-slate-900"
+                className="w-full bg-green-50 border border-green-300 rounded px-4 py-3 text-green-900 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-[#166534] file:text-white hover:file:bg-green-900"
                 required
               />
             </div>
@@ -232,9 +232,9 @@ export default function AdminPanel() {
         </div>
 
         {/* Reset User Password */}
-        <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-slate-200 lg:col-span-2">
-          <h2 className="text-xl font-bold text-slate-800 mb-6 border-b pb-2">Reset User Password</h2>
-          <p className="text-sm text-slate-600 mb-6 font-medium bg-slate-50 p-4 border border-slate-200 rounded">
+        <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-green-200 lg:col-span-2">
+          <h2 className="text-xl font-bold text-green-800 mb-6 border-b pb-2">Reset User Password</h2>
+          <p className="text-sm text-green-600 mb-6 font-medium bg-green-50 p-4 border border-green-200 rounded">
             Reset a user's password directly to the lab default (<code className="bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-mono">istc@12345</code>). They will be able to change it through their profile after logging in.
           </p>
 
@@ -252,12 +252,12 @@ export default function AdminPanel() {
 
           <form onSubmit={handleResetSubmit} className="space-y-6 max-w-xl">
             <div>
-              <label className="block text-slate-700 text-sm font-bold mb-2 tracking-wider">User's Email</label>
+              <label className="block text-green-700 text-sm font-bold mb-2 tracking-wider">User's Email</label>
               <input
                 type="email"
                 value={resetEmail}
                 onChange={(e) => setResetEmail(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/50 focus:border-[#003366]"
+                className="w-full bg-green-50 border border-green-300 rounded px-4 py-3 text-green-900 placeholder-green-400 focus:outline-none focus:ring-2 focus:ring-[#166534]/50 focus:border-[#166534]"
                 placeholder="name@example.com"
                 required
               />
@@ -266,7 +266,7 @@ export default function AdminPanel() {
             <button
               type="submit"
               disabled={isResetLoading}
-              className="bg-[#003366] hover:bg-slate-900 text-white font-bold py-3 px-8 rounded transition-colors disabled:opacity-50 mt-4 shadow-sm uppercase tracking-wider"
+              className="bg-[#166534] hover:bg-green-900 text-white font-bold py-3 px-8 rounded transition-colors disabled:opacity-50 mt-4 shadow-sm uppercase tracking-wider"
             >
               {isResetLoading ? "Resetting..." : "Reset to Default"}
             </button>
