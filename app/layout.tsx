@@ -21,7 +21,7 @@ export default function RootLayout({
           </h1>
         </header>
 
-        {/* MAIN */}
+        {/* 🔷 MAIN (SCROLL ENABLED) */}
         <main className="flex-1 overflow-y-auto">
           {children}
         </main>
