@@ -55,12 +55,12 @@ export default function ExperimentPage() {
               key={exp.uuid}
               href={`/experiments/${exp.uuid}`}
               className={`block p-3 rounded-xl transition-all border-l-4 ${id === exp.uuid
-                  ? "bg-[#d1f2eb] border-[#0B5D57] shadow-md"
-                  : "bg-white border-transparent hover:bg-[#d1f2eb] hover:border-[#0B5D57]"
+                ? "bg-[#d1f2eb] border-[#0B5D57] shadow-md"
+                : "bg-white border-transparent hover:bg-[#d1f2eb] hover:border-[#0B5D57]"
                 }`}
             >
               <p className="font-medium text-[#2c3e50]">
-                {exp.replace("-", " ").toUpperCase()}
+                {exp.name}
               </p>
             </Link>
           ))}

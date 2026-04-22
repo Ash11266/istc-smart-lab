@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     }
 
     const textData = await file.text();
-    
+
     // Limit data length to avoid exceeding context window if the CSV is massive
     const truncatedData = textData.length > 50000 ? textData.slice(0, 50000) + "\n...[TRUNCATED]" : textData;
 
@@ -57,11 +57,10 @@ ${truncatedData}
     );
 
     const data = await response.json();
-    console.log("=== GEMINI API RESPONSE ===", JSON.stringify(data, null, 2));
 
     if (data.error) {
-      return NextResponse.json({ 
-        report: `**Gemini API Error:** ${data.error.message}` 
+      return NextResponse.json({
+        report: `**Gemini API Error:** ${data.error.message}`
       });
     }
 
