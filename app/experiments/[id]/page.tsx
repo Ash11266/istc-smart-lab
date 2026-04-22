@@ -3,33 +3,60 @@
 import Link from "next/link";
 import ExperimentStream from "./ExperimentStream";
 import AIChat from "@/components/AIChat";
+import { cookies } from "next/headers";
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import ScrollToTop from "@/components/ScrollToTop";
-import AIUpload from "./AIUpload";
-import MLPrediction from "./MLPrediction";
+export default async function ExperimentPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get("session")?.value;
+  const headers: HeadersInit = sessionCookie ? { Cookie: `session=${sessionCookie}` } : {};
 
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/experiments/${id}`,
+    {
+      cache: "no-store",
+      headers,
+    }
+  );
+  let experiment = null;
+  let isForbidden = false;
 
-export default function ExperimentPage() {
-  const params = useParams();
-  const id = params.id as string;
+  if (res.ok) {
+    experiment = await res.json();
+  } else if (res.status === 403) {
+    isForbidden = true;
+  }
 
-  const [experiment, setExperiment] = useState<any>(null);
-  const [experiments, setExperiments] = useState<any[]>([]);
+  // Fetch all experiments for sidebar
+  const allRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/experiments`, {
+    cache: "no-store",
+    headers,
+  });
+  let allExperiments: any[] = [];
+  if (allRes.ok) {
+    const data = await allRes.json();
+    allExperiments = Array.isArray(data) ? data : data.data || [];
+  }
 
-  useEffect(() => {
-    fetch(`/api/experiments/${id}`)
-      .then((res) => res.json())
-      .then((data) => setExperiment(data));
-
-    fetch("/api/experiments")
-      .then((res) => res.json())
-      .then((data) => {
-        const list = Array.isArray(data) ? data : data.data || [];
-        setExperiments(list);
-      });
-  }, [id]);
+  if (isForbidden) {
+    return (
+      <div className="max-w-2xl mx-auto py-24 px-4 text-center text-slate-900">
+        <div className="bg-white border-2 border-red-700 p-8 shadow-sm">
+          <h2 className="text-2xl font-bold mb-2 text-red-700">
+            Access Denied
+          </h2>
+          <p className="mb-6">
+            You do not have permission to view this private experiment.
+          </p>
+          <Link href="/experiments">Back</Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!experiment) {
     return (
@@ -54,14 +81,21 @@ export default function ExperimentPage() {
             <Link
               key={exp.uuid}
               href={`/experiments/${exp.uuid}`}
-              className={`block p-3 rounded-xl transition-all border-l-4 ${id === exp.uuid
-                ? "bg-[#d1f2eb] border-[#0B5D57] shadow-md"
-                : "bg-white border-transparent hover:bg-[#d1f2eb] hover:border-[#0B5D57]"
+              className={`p-3 rounded-lg block transition shadow-sm ${id === exp.uuid
+                ? "bg-orange-200 border-l-4 border-orange-500"
+                : "bg-white hover:bg-blue-50"
                 }`}
             >
-              <p className="font-medium text-[#2c3e50]">
-                {exp.name}
-              </p>
+              <div className="flex flex-col">
+                <p className="font-medium text-[#2c3e50]">
+                  {exp.name}
+                </p>
+                {!!exp.is_private && (
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 bg-slate-200 px-1.5 py-0.5 rounded mt-1 w-fit">
+                    Private
+                  </span>
+                )}
+              </div>
             </Link>
           ))}
         </div>
@@ -73,64 +107,48 @@ export default function ExperimentPage() {
         <div className="max-w-6xl mx-auto py-8 px-6">
 
           {/* HEADER */}
-          <div className="mb-6 border-b pb-4">
+          <div className="mb-6 border-b-2 border-slate-300 pb-4">
             <Link
               href="/experiments"
-              className="text-sm font-bold text-[#0B5D57] hover:underline"
+              className="inline-flex items-center text-sm font-bold text-[#003366] hover:underline mb-4 uppercase tracking-wider"
             >
-              ← Back
+              Back to Directory
             </Link>
 
-            <h1 className="text-4xl font-bold text-[#0B5D57] mt-2">
+            <h1 className="text-4xl font-semibold text-[#154360]">
               {experiment.name}
             </h1>
           </div>
 
-          {/* CARDS */}
-          <div className="grid md:grid-cols-2 gap-6">
+          {/* INFO */}
+          <div className="grid md:grid-cols-2 gap-8">
 
-            <div className="bg-white p-6 rounded-xl shadow border">
-              <h2 className="text-xl font-bold mb-3 text-[#0B5D57]">
-                Overview
-              </h2>
-              <p className="text-gray-700">
-                {experiment.description || "No description"}
-              </p>
+            <div className="bg-white border p-6 rounded-lg shadow-sm">
+              <h2 className="text-xl font-bold mb-4">Overview</h2>
+              <p>{experiment.description || "No description"}</p>
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow border">
-              <h2 className="text-xl font-bold mb-3 text-[#0B5D57]">
-                Components
-              </h2>
-              <p className="text-gray-700">
-                {experiment.components || "None"}
-              </p>
+            <div className="bg-white border p-6 rounded-lg shadow-sm">
+              <h2 className="text-xl font-bold mb-4">Components</h2>
+              <p>{experiment.components || "None"}</p>
             </div>
 
           </div>
 
           {/* LIVE DATA */}
-          <div className="bg-white p-6 mt-6 rounded-xl shadow border">
-            <h2 className="text-xl font-bold mb-3 text-[#0B5D57]">
-              Live Data
-            </h2>
+          <div className="bg-white border p-6 mt-6 rounded-lg shadow-sm">
+            <h2 className="text-xl font-bold mb-4">Live Data</h2>
             <ExperimentStream dataValues={experiment.dataValues} />
           </div>
 
-          {/* AI */}
-          <div className="mt-6 mb-10">
+          {/* AI SECTION */}
+          <div className="mt-6">
             <AIChat
               description={experiment.description}
               components={experiment.components}
               dataValues={experiment.dataValues}
             />
           </div>
-
-          {/* AI UPLOAD */}
-          <AIUpload />
-
-          {/* 🔥 NEW ML PREDICTION */}
-          <MLPrediction />
 
         </div>
       </div>

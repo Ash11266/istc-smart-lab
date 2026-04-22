@@ -6,45 +6,82 @@ import { decrypt } from "@/lib/auth";
 export async function GET(req: NextRequest) {
     try {
         const cookie = req.cookies.get("session")?.value;
+
         let isAdmin = false;
-        
+        let isLoggedIn = false;
+        let userId: number | null = null;
+
+        // 🔐 Decode session
         if (cookie) {
-             const session = await decrypt(cookie);
-             if (session?.isAdmin) isAdmin = true;
+            const session = await decrypt(cookie);
+            if (session) {
+                isLoggedIn = true;
+                userId = session.userId;
+                isAdmin = !!session.isAdmin;
+            }
         }
 
-        const [rows]: any = await db.query(`
-            SELECT e.*, u.name as created_by_name 
-            FROM experiments e 
+        // 🧠 Build query dynamically
+        let query = `
+            SELECT e.*, u.name AS created_by_name
+            FROM experiments e
             LEFT JOIN users u ON e.created_by = u.id
-            ORDER BY e.created_at DESC
-        `);
+        `;
 
-        return NextResponse.json({ data: rows, isAdmin }); 
+        const params: any[] = [];
+
+        if (!isAdmin) {
+            if (isLoggedIn) {
+                query += `
+                    WHERE e.is_private = 0
+                    OR e.created_by = ?
+                `;
+                params.push(userId);
+            } else {
+                query += `
+                    WHERE e.is_private = 0
+                `;
+            }
+        }
+
+        query += ` ORDER BY e.created_at DESC`;
+
+        // 🚀 Execute query
+        const [rows]: any = await db.query(query, params);
+
+        return NextResponse.json({
+            data: rows,
+            isAdmin,
+            isLoggedIn,
+        });
+
     } catch (error) {
         console.error("Fetch error:", error);
-        return NextResponse.json({ message: "Failed to fetch experiments" }, { status: 500 });
+        return NextResponse.json(
+            { message: "Failed to fetch experiments" },
+            { status: 500 }
+        );
     }
 }
 
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { name, description, components, dataValues } = body;
+        const { name, description, components, dataValues, isPrivate } = body;
 
         const cookie = req.cookies.get("session")?.value;
         let userId = null;
         if (cookie) {
-             const session = await decrypt(cookie);
-             if (session?.userId) userId = session.userId;
+            const session = await decrypt(cookie);
+            if (session?.userId) userId = session.userId;
         }
 
         const uuid = uuidv4();
 
         await db.query(
-            `INSERT INTO experiments (uuid, name, description, components, dataValues, created_by)
-             VALUES (?, ?, ?, ?, ?, ?)`,
-            [uuid, name, description, components, dataValues, userId]
+            `INSERT INTO experiments (uuid, name, description, components, dataValues, created_by, is_private)
+             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [uuid, name, description, components, dataValues, userId, isPrivate ? true : false]
         );
 
         return NextResponse.json({

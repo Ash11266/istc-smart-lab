@@ -96,6 +96,7 @@ export default function ExperimentsPage() {
         {/* LIST */}
         <div className="flex-1 overflow-y-auto space-y-3 pr-1">
 
+<<<<<<< HEAD
           {filteredExperiments.map((exp, idx) => {
             const isActive = selectedId === exp.uuid;
 
@@ -145,6 +146,28 @@ export default function ExperimentsPage() {
           <p className="text-lg text-gray-500">
             Select an experiment from the left
           </p>
+=======
+          {experiments.map((exp, idx) => (
+            <div key={exp.uuid || idx} onClick={() => router.push(`/experiments/${exp.uuid}`)}
+              className="group p-3 rounded-lg cursor-pointer transition-all duration-200 shadow-sm bg-white hover:bg-blue-50 flex justify-between items-center"
+            >
+              <div className="flex flex-col">
+                <p className="font-medium text-[#2c3e50]">{exp.name}</p>
+                {exp.is_private ? (
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 bg-slate-200 px-1.5 py-0.5 rounded mt-1 w-fit">Private</span>
+                ) : null}
+              </div>
+              {isAdmin && (
+                <button
+                  onClick={(e) => handleDelete(e, exp.uuid)}
+                  className="hidden group-hover:block bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600 transition shadow-sm"
+                >
+                  Delete
+                </button>
+              )}
+            </div>
+          ))}
+>>>>>>> PageDesign
 
         </div>
 

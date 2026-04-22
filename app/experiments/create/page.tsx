@@ -11,6 +11,7 @@ export default function CreateExperiment() {
   const [description, setDescription] = useState("");
   const [components, setComponents] = useState("");
   const [dataValues, setDataValues] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: any) => {
@@ -23,7 +24,7 @@ export default function CreateExperiment() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, description, components, dataValues }),
+        body: JSON.stringify({ name, description, components, dataValues, isPrivate }),
       });
 const data = await res.json();
 console.log("API RESPONSE:", data);
@@ -120,6 +121,22 @@ console.log("API RESPONSE:", data);
               onChange={(e) => setDataValues(e.target.value)}
               className="block w-full px-4 py-3 border border-slate-400 bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#003366] focus:border-[#003366] rounded-none shadow-sm"
             />
+          </div>
+
+          <div className="space-y-2 flex items-center gap-3">
+             <input
+              id="isPrivate"
+              type="checkbox"
+              checked={isPrivate}
+              onChange={(e) => setIsPrivate(e.target.checked)}
+              className="w-5 h-5 text-[#003366] rounded-sm focus:ring-[#003366] border-slate-400"
+            />
+            <label htmlFor="isPrivate" className="block text-sm font-bold text-slate-900">
+              Make this experiment private
+            </label>
+            <p className="text-xs text-slate-600 font-medium ml-2">
+              (Only visible to you and administrators)
+            </p>
           </div>
 
           <div className="pt-6 border-t border-slate-300 flex items-center justify-end gap-6 bg-slate-50 -mx-8 sm:-mx-10 -mb-8 sm:-mb-10 px-8 sm:px-10 py-6 border-t-4 border-[#003366]">
