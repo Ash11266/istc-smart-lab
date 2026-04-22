@@ -1,5 +1,6 @@
 import "./globals.css";
 import LiveTime from "@/components/LiveTime";
+import BackgroundVideo from "./components/BackgroundVideo";
 
 export const metadata = {
   title: "Data Acquisition & Monitoring System",
@@ -13,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen flex flex-col bg-[#e6edf3] text-black">
+      <body className="h-screen overflow-hidden flex flex-col bg-[#e6edf3] text-black">
 
         {/* HEADER */}
         <header
@@ -32,13 +33,18 @@ export default function RootLayout({
         </header>
 
         {/* MAIN (NO SCROLL) */}
-        <main className="flex-1 overflow-hidden">
-          {children}
+        <main className="flex-1 overflow-hidden relative flex flex-col min-h-0">
+          <BackgroundVideo />
+
+          {/* PAGE CONTENT */}
+          <div className="relative z-10 w-full flex-1 flex flex-col min-h-0">
+            {children}
+          </div>
         </main>
 
         {/* FOOTER */}
         <footer
-          className="w-full h-14 flex items-center justify-center text-white text-sm tracking-wide border-t-[5px] border-orange-400 gap-3"
+          className="w-full h-14 flex items-center justify-center text-white text-sm tracking-wide border-t-[5px] border-orange-400 gap-3 relative z-20"
           style={{ backgroundColor: "#0B5D57" }}
         >
           <span>Research Laboratory Interface</span>

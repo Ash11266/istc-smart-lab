@@ -56,10 +56,10 @@ export default function ExperimentsPage() {
   );
 
   return (
-    <div className="flex h-full">
+    <div className="flex flex-1 min-h-0">
 
       {/* 🔷 SIDEBAR */}
-      <div className="w-72 bg-gradient-to-b from-[#e8f6f3] to-[#d1f2eb] border-r-[6px] border-orange-500 p-4 flex flex-col shadow-md">
+      <div className="w-72 bg-gradient-to-b from-[#e8f6f3]/80 to-[#d1f2eb]/80 border-r-[6px] border-orange-500 p-4 flex flex-col shadow-md backdrop-blur-sm">
 
         <h2 className="text-xl font-bold mb-3 text-[#0B5D57]">
           Experiments
@@ -125,7 +125,7 @@ export default function ExperimentsPage() {
       </div>
 
       {/* 🔷 RIGHT SIDE */}
-      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-[#f0fbfa] to-white">
+      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-[#f0fbfa]/80 to-white/80 backdrop-blur-sm">
 
         <div className="text-center">
 

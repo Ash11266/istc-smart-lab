@@ -42,7 +42,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative flex items-center justify-center min-h-screen">
+    <div className="relative flex items-center justify-center h-full min-h-full">
 
       {/* 🔥 BLUR BACKGROUND */}
       <div className="absolute inset-0 backdrop-blur-lg bg-black/40"></div>

@@ -38,10 +38,10 @@ export default function ExperimentPage() {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex flex-1 min-h-0">
 
       {/* 🔷 SIDEBAR */}
-      <div className="w-72 bg-gradient-to-b from-[#e8f6f3] to-[#d1f2eb] border-r-[5px] border-orange-500 p-4 flex flex-col">
+      <div className="w-72 bg-gradient-to-b from-[#e8f6f3]/80 to-[#d1f2eb]/80 border-r-[5px] border-orange-500 p-4 flex flex-col backdrop-blur-sm">
 
         <h2 className="text-xl font-bold mb-3 text-[#0B5D57]">
           Experiments
@@ -78,7 +78,7 @@ export default function ExperimentPage() {
       </div>
 
       {/* 🔷 RIGHT CONTENT */}
-      <div className="flex-1 overflow-y-auto bg-gradient-to-br from-[#f0fbfa] to-white">
+      <div className="flex-1 overflow-y-auto bg-gradient-to-br from-[#f0fbfa]/80 to-white/80 backdrop-blur-sm">
 
         <div className="max-w-6xl mx-auto py-8 px-6">
 
