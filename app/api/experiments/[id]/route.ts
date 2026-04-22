@@ -3,15 +3,21 @@ import db from "@/lib/db";
 import { decrypt } from "@/lib/auth";
 
 export async function GET(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> } // 👈 params is Promise now
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params; // 👈 MUST await
+    const { id } = await params;
+
+    // Convert slug → keyword
+    const keyword = id.replace(/-/g, " ");
 
     const [rows]: any = await db.query(
-      "SELECT uuid, name, description, components, dataValues FROM experiments WHERE uuid = ?",
-      [id]
+      `SELECT uuid, name, description, components, dataValues, is_private, created_by
+       FROM experiments
+       WHERE uuid = ?
+       OR LOWER(name) LIKE LOWER(?)`,
+      [id, `%${keyword}%`]
     );
 
     if (rows.length === 0) {
@@ -21,7 +27,30 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(rows[0]);
+    const experiment = rows[0];
+
+    const isPrivate = Boolean(Number(experiment.is_private));
+
+    // Authorization check
+    if (isPrivate) {
+      const cookie = req.cookies.get("session")?.value;
+      let isAuthorized = false;
+      if (cookie) {
+        const session = await decrypt(cookie);
+        if (session && (session.isAdmin || String(session.userId) === String(experiment.created_by))) {
+          isAuthorized = true;
+        }
+      }
+      
+      if (!isAuthorized) {
+        return NextResponse.json(
+          { message: "Forbidden" },
+          { status: 403 }
+        );
+      }
+    }
+
+    return NextResponse.json(experiment);
 
   } catch (error) {
     console.error("Database error:", error);

@@ -49,6 +49,7 @@ async function seed() {
         components VARCHAR(500),
         dataValues VARCHAR(500),
         created_by INT,
+        is_private BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
