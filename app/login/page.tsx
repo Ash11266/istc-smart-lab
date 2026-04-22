@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function LoginPage() {
@@ -101,12 +101,12 @@ export default function LoginPage() {
 
           {/* 🔥 BUTTON */}
           <button
-  type="submit"
-  disabled={loading}
-  className="w-full mt-6 bg-orange-50 hover:bg-orange-600 text-orange py-3 rounded-xl font-bold text-lg shadow-xl border-2 border-orange-600 transition-all duration-200 active:scale-95"
->
-  {loading ? "Signing..." : "LOGIN"}
-</button>
+            type="submit"
+            disabled={loading}
+            className="w-full mt-6 bg-orange-50 hover:bg-orange-600 text-orange py-3 rounded-xl font-bold text-lg shadow-xl border-2 border-orange-600 transition-all duration-200 active:scale-95"
+          >
+            {loading ? "Signing..." : "LOGIN"}
+          </button>
 
         </form>
       </div>

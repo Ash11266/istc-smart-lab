@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     const token = await encrypt({ userId: user.id, email: user.email, isAdmin: !!user.is_admin });
 
     // Set cookie
-    const response = NextResponse.json({ success: true, token }, { status: 200 });
+    const response = NextResponse.json({ success: true }, { status: 200 });
     
     response.cookies.set({
       name: "session",

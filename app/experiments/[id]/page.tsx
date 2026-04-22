@@ -3,9 +3,12 @@
 import Link from "next/link";
 import ExperimentStream from "./ExperimentStream";
 import AIChat from "@/components/AIChat";
+
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import ScrollToTop from "@/components/ScrollToTop";
+import AIUpload from "./AIUpload";
+import MLPrediction from "./MLPrediction";
 
 
 export default function ExperimentPage() {
@@ -30,7 +33,7 @@ export default function ExperimentPage() {
 
   if (!experiment) {
     return (
-      
+
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-lg text-gray-500">Loading...</p>
       </div>
@@ -38,42 +41,29 @@ export default function ExperimentPage() {
   }
 
   return (
-    <div className="flex flex-1 min-h-0">
+    <div className="flex min-h-screen">
 
-      {/* 🔷 SIDEBAR */}
-      <div className="w-72 bg-gradient-to-b from-[#e8f6f3]/80 to-[#d1f2eb]/80 border-r-[5px] border-orange-500 p-4 flex flex-col backdrop-blur-sm">
-
-        <h2 className="text-xl font-bold mb-3 text-[#0B5D57]">
+      {/* 🔷 LEFT SIDEBAR */}
+      <div className="w-1/4 bg-[#d6eaf8] border-r-4 border-orange-400 p-4 flex flex-col">
+        <h2 className="text-xl font-semibold mb-4 text-[#154360]">
           Experiments
         </h2>
 
-        {/* 🔥 CREATE BUTTON */}
-        <Link
-          href="/experiments/create"
-          className="mb-4 text-center bg-white-500 hover:bg-white-600 text-orange font-bold py-2 px-4 rounded-lg shadow-md transition"
-        >
-          + Create Experiment
-        </Link>
-
-        {/* SCROLLABLE LIST */}
-        <div className="flex-1 overflow-y-auto space-y-3 pr-1">
-
+        <div className="flex-1 overflow-y-auto space-y-2">
           {experiments.map((exp) => (
             <Link
               key={exp.uuid}
               href={`/experiments/${exp.uuid}`}
-              className={`block p-3 rounded-xl transition-all border-l-4 ${
-                id === exp.uuid
+              className={`block p-3 rounded-xl transition-all border-l-4 ${id === exp.uuid
                   ? "bg-[#d1f2eb] border-[#0B5D57] shadow-md"
                   : "bg-white border-transparent hover:bg-[#d1f2eb] hover:border-[#0B5D57]"
-              }`}
+                }`}
             >
-              <p className="font-semibold text-[#0B5D57]">
-                {exp.name}
+              <p className="font-medium text-[#2c3e50]">
+                {exp.replace("-", " ").toUpperCase()}
               </p>
             </Link>
           ))}
-
         </div>
       </div>
 
@@ -136,9 +126,14 @@ export default function ExperimentPage() {
             />
           </div>
 
+          {/* AI UPLOAD */}
+          <AIUpload />
+
+          {/* 🔥 NEW ML PREDICTION */}
+          <MLPrediction />
+
         </div>
       </div>
-
     </div>
   );
 }
