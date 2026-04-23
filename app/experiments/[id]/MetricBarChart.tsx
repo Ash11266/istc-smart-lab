@@ -13,9 +13,10 @@ type MqttMessage = {
 interface MetricBarChartProps {
   metric: string;
   data: MqttMessage[];
+  unit?: string;
 }
 
-export default function MetricBarChart({ metric, data }: MetricBarChartProps) {
+export default function MetricBarChart({ metric, data, unit }: MetricBarChartProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -59,7 +60,7 @@ export default function MetricBarChart({ metric, data }: MetricBarChartProps) {
           if (!pt) return '';
           const date = new Date(pt.value[0]);
           const timeStr = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
-          return `${timeStr}<br/>${pt.seriesName}: <b>${pt.value[1]}</b>`;
+          return `${timeStr}<br/>${pt.seriesName}: <b>${pt.value[1]}${unit ? ' ' + unit : ''}</b>`;
         }
       },
       grid: {
@@ -86,9 +87,13 @@ export default function MetricBarChart({ metric, data }: MetricBarChartProps) {
       yAxis: {
         type: 'value',
         splitLine: { show: true, lineStyle: { color: '#e2e8f0', type: 'solid' } },
-        axisLine: { show: true, lineStyle: { color: '#22c55e' } },
-        axisTick: { show: true, lineStyle: { color: '#22c55e' } },
-        axisLabel: { color: '#475569', fontSize: 11 }
+        axisLine: { show: true, lineStyle: { color: '#64748b' } },
+        axisTick: { show: true, lineStyle: { color: '#64748b' } },
+        axisLabel: {
+          color: '#475569',
+          fontSize: 11,
+          formatter: (value: any) => unit ? `${value} ${unit}` : value
+        }
       },
       series: [
         {
@@ -126,7 +131,7 @@ export default function MetricBarChart({ metric, data }: MetricBarChartProps) {
 
           <button
             onClick={toggleFullscreen}
-            className="text-green-500 hover:text-[#166534] transition-colors p-1.5 bg-green-100 hover:bg-green-200 border border-green-300 rounded-sm shadow-sm"
+            className="text-slate-500 hover:text-[#003366] transition-colors p-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl shadow-sm"
             title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
           >
             {isFullscreen ? (

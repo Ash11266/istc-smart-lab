@@ -1,38 +1,72 @@
-import Link from "next/link";
-import { cookies } from "next/headers";
+"use client";
 
-export default async function Home() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("session")?.value;
-  const isLoggedIn = !!token;
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+
+export default function Home() {
+  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function checkAuth() {
+      try {
+        const res = await fetch("/api/auth/session");
+        const data = await res.json();
+        if (data.authenticated) {
+          setIsLoggedIn(true);
+        }
+      } catch (error) {
+        console.error("Failed to check auth session:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    checkAuth();
+  }, []);
+
+  const handleClick = () => {
+    if (isLoggedIn) {
+      router.push("/experiments");
+    } else {
+      router.push("/login");
+    }
+  };
 
   return (
-    <div className="h-full w-full relative">
-
-      {/* 🎥 VIDEO BACKGROUND */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover opacity-90"
+    <div
+      onClick={handleClick}
+      className="w-full h-full flex flex-col items-center justify-center text-center cursor-pointer select-none"
+    >
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="flex flex-col items-center"
       >
-        <source src="/animation.mp4" type="video/mp4" />
-      </video>
+        <h1 className="text-white text-4xl md:text-6xl font-bold mb-8 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)] tracking-tight">
+          {loading ? (
+            <span className="opacity-50">Checking status...</span>
+          ) : isLoggedIn ? (
+            "Click Anywhere to Continue"
+          ) : (
+            "Click Anywhere to Login"
+          )}
+        </h1>
 
-      {/* LIGHT OVERLAY */}
-      <div className="absolute inset-0 bg-white/20"></div>
+        <motion.div 
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="px-12 py-5 bg-gradient-to-r from-orange-500 to-orange-600 text-white text-2xl font-black rounded-xl shadow-[0_10px_30px_rgba(249,115,22,0.4)] transition-all"
+        >
+          {isLoggedIn ? "Enter Experiments" : "Enter System"}
+        </motion.div>
 
-      {/* CENTER TEXT LINK */}
-      <Link
-        href={isLoggedIn ? "/experiments" : "/login"}
-        className="absolute inset-0 flex flex-col items-center justify-center z-10"
-      >
-        <p className="mt-6 text-xl md:text-2xl font-semibold text-black animate-pulse tracking-wide drop-shadow-md">
-          {isLoggedIn ? "Click anywhere to continue" : "Click anywhere to login"}
+        <p className="mt-6 text-white/60 text-sm font-medium tracking-[0.2em] uppercase">
+          {isLoggedIn ? "Welcome back to Smart Lab" : "Access the Research Interface"}
         </p>
-      </Link>
-
+      </motion.div>
     </div>
   );
-}
+}

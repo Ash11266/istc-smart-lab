@@ -1,38 +1,63 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-
-
+import {
+  Beaker,
+  Search,
+  Plus,
+  Trash2,
+  LayoutDashboard,
+  Activity,
+  Lock,
+  FlaskConical,
+  Clock,
+  ArrowRight
+} from "lucide-react";
 
 export default function ExperimentsPage() {
   const router = useRouter();
+
   const [experiments, setExperiments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    fetch("/api/experiments")
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setExperiments(data);
-        } else if (data.data) {
-          setExperiments(data.data);
-          setIsAdmin(!!data.isAdmin);
-          setIsLoggedIn(!!data.isLoggedIn);
+    const fetchExperiments = async () => {
+      try {
+        const res = await fetch("/api/experiments");
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch experiments");
+        }
+
+        const result = await res.json();
+
+        if (result && Array.isArray(result.data)) {
+          setExperiments(result.data);
+          setIsAdmin(result.isAdmin || false);
+          setIsLoggedIn(result.isLoggedIn || false);
+        } else if (Array.isArray(result)) {
+          setExperiments(result);
         } else {
+          console.warn("Unexpected response:", result);
           setExperiments([]);
         }
-        setLoading(false);
-      })
-      .catch(() => {
+      } catch (error) {
+        console.error("Fetch error:", error);
         setExperiments([]);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchExperiments();
   }, []);
+
   const handleDelete = async (e: React.MouseEvent, uuid: string) => {
     e.preventDefault();
     e.stopPropagation();
@@ -41,67 +66,116 @@ export default function ExperimentsPage() {
     try {
       const res = await fetch(`/api/experiments/${uuid}`, { method: "DELETE" });
       if (res.ok) {
-        setExperiments(prev => prev.filter(exp => exp.uuid !== uuid));
+        setExperiments((prev) => prev.filter((exp) => exp.uuid !== uuid));
       } else {
         alert("Failed to delete experiment");
       }
-    } catch (err) {
+    } catch {
       alert("Error deleting experiment");
     }
   };
 
+  const filteredExperiments = experiments.filter((exp) =>
+    exp.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const stats = {
+    total: experiments.length,
+    private: experiments.filter(e => e.is_private).length,
+    public: experiments.filter(e => !e.is_private).length,
+  };
+
   return (
-    <div className="flex h-full">
+    <div className="flex flex-1 h-full overflow-hidden">
 
-      {/* 🔷 LEFT SIDEBAR */}
-      <div className="w-1/4 bg-[#d6eaf8] border-r-4 border-orange-400 p-4 flex flex-col">
+      {/* 🔷 SIDEBAR */}
+      <div className="w-80 bg-gradient-to-b from-[#e8f6f3]/90 to-[#d1f2eb]/90 border-r-[6px] border-orange-500 p-6 flex flex-col shadow-xl backdrop-blur-md z-20">
 
-        <h2 className="text-xl font-semibold mb-4 text-[#154360]">
-          Experiments
-        </h2>
+        <div className="flex items-center gap-3 mb-6">
+          <FlaskConical className="text-[#0B5D57]" size={28} />
+          <h2 className="text-2xl font-bold text-[#0B5D57] tracking-tight">
+            Experiments
+          </h2>
+        </div>
 
+        {/* 🔍 SEARCH */}
+        <div className="relative mb-6">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+          <input
+            type="text"
+            placeholder="Search laboratory..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 rounded-xl border border-teal-200 focus:outline-none focus:ring-2 focus:ring-[#0B5D57] shadow-inner bg-white/80 transition-all"
+          />
+        </div>
+
+        {/* 🔥 CREATE BUTTON */}
         {isLoggedIn && (
-          <Link href="/experiments/create" className="mb-4 text-center bg-orange-400 hover:bg-orange-500 text-white font-medium py-2 px-4 rounded shadow-sm transition">
-            + Create Experiment
+          <Link
+            href="/experiments/create"
+            className="mb-8 flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 transition transform hover:scale-[1.02] active:scale-95"
+          >
+            <Plus size={20} /> Create Experiment
           </Link>
         )}
 
-        <div className="flex-1 overflow-y-auto space-y-2">
+        {/* LIST */}
+        <div className="flex-1 overflow-y-auto space-y-4 pr-1 custom-scrollbar">
+          {filteredExperiments.map((exp, idx) => {
+            const isActive = selectedId === exp.uuid;
 
-          {experiments.map((exp, idx) => (
-            <div key={exp.uuid || idx} onClick={() => router.push(`/experiments/${exp.uuid}`)}
-              className="group p-3 rounded-lg cursor-pointer transition-all duration-200 shadow-sm bg-white hover:bg-green-50 flex justify-between items-center"
-            >
-              <div className="flex flex-col">
-                <p className="font-medium text-[#2c3e50]">{exp.name}</p>
-                {exp.is_private ? (
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-green-500 bg-green-200 px-1.5 py-0.5 rounded mt-1 w-fit">Private</span>
-                ) : null}
+            return (
+              <div
+                key={exp.uuid || idx}
+                onClick={() => {
+                  setSelectedId(exp.uuid);
+                  router.push(`/experiments/${exp.uuid}`);
+                }}
+                className={`group p-4 rounded-xl cursor-pointer transition-all duration-300 shadow-sm flex justify-between items-center border
+                  ${isActive
+                    ? "bg-[#d1f2eb] border-[#0B5D57] scale-[1.02] shadow-md"
+                    : "bg-white/70 border-teal-50 hover:bg-white hover:scale-[1.03] hover:shadow-lg border-l-4 border-l-transparent hover:border-l-[#0B5D57]"
+                  }
+                `}
+              >
+                <div className="flex-1 min-w-0">
+                  <p className={`font-bold truncate ${isActive ? "text-[#0B5D57]" : "text-slate-700 group-hover:text-[#0B5D57]"}`}>
+                    {exp.name}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    {exp.is_private ? (
+                      <span className="flex items-center gap-1 text-[10px] uppercase font-black tracking-tighter text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full">
+                        <Lock size={10} /> Private
+                      </span>
+                    ) : (
+                      <span className="text-[10px] uppercase font-black tracking-tighter text-teal-600 bg-teal-100 px-2 py-0.5 rounded-full">Public</span>
+                    )}
+                  </div>
+                </div>
+
+                {isAdmin && (
+                  <button
+                    onClick={(e) => handleDelete(e, exp.uuid)}
+                    className="opacity-0 group-hover:opacity-100 p-2 text-red-400 hover:text-red-600 transition-all hover:bg-red-50 rounded-xl"
+                    title="Delete Experiment"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                )}
               </div>
-              {isAdmin && (
-                <button
-                  onClick={(e) => handleDelete(e, exp.uuid)}
-                  className="hidden group-hover:block bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600 transition shadow-sm"
-                >
-                  Delete
-                </button>
-              )}
-            </div>
-          ))}
+            );
+          })}
 
+          {filteredExperiments.length === 0 && !loading && (
+            <div className="text-center p-8 bg-white/30 rounded-xl border border-dashed border-teal-200">
+              <Beaker className="mx-auto text-teal-300 mb-2" size={32} />
+              <p className="text-slate-500 text-sm italic">No experiments found.</p>
+            </div>
+          )}
         </div>
 
       </div>
-
-      {/* 🔷 RIGHT SIDE DEFAULT */}
-      <div className="flex-1 flex items-center justify-center bg-[#f4f9fd]">
-
-        <h1 className="text-2xl text-gray-500">
-          Select an experiment from the left
-        </h1>
-
-      </div>
-
     </div>
   );
 }

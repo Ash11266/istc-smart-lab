@@ -60,7 +60,7 @@ export default function MetricLineChart({ metric, data, unit }: MetricLineChartP
           if (!pt) return '';
           const date = new Date(pt.value[0]);
           const timeStr = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
-          return `${timeStr}<br/>${pt.seriesName}: <b>${pt.value[1]} ${unit || ''}</b>`;
+          return `${timeStr}<br/>${pt.seriesName}: <b>${pt.value[1]}${unit ? ' ' + unit : ''}</b>`;
         }
       },
       grid: {
@@ -86,16 +86,14 @@ export default function MetricLineChart({ metric, data, unit }: MetricLineChartP
       },
       yAxis: {
         type: 'value',
-        name: unit || '',
-        nameTextStyle: {
-          color: '#475569',
-          fontSize: 10,
-          align: 'right'
-        },
         splitLine: { show: true, lineStyle: { color: '#e2e8f0', type: 'solid' } },
-        axisLine: { show: true, lineStyle: { color: '#22c55e' } },
-        axisTick: { show: true, lineStyle: { color: '#22c55e' } },
-        axisLabel: { color: '#475569', fontSize: 11 }
+        axisLine: { show: true, lineStyle: { color: '#64748b' } },
+        axisTick: { show: true, lineStyle: { color: '#64748b' } },
+        axisLabel: {
+          color: '#475569',
+          fontSize: 11,
+          formatter: (value: any) => unit ? `${value} ${unit}` : value
+        }
       },
       series: [
         {
@@ -118,7 +116,7 @@ export default function MetricLineChart({ metric, data, unit }: MetricLineChartP
         }
       ]
     };
-  }, [data, metric, unit]);
+  }, [data, metric]);
 
   const isEmpty = data.length === 0;
 
@@ -141,7 +139,7 @@ export default function MetricLineChart({ metric, data, unit }: MetricLineChartP
 
           <button
             onClick={toggleFullscreen}
-            className="text-green-500 hover:text-[#166534] transition-colors p-1.5 bg-green-100 hover:bg-green-200 border border-green-300 rounded-sm shadow-sm"
+            className="text-slate-500 hover:text-[#003366] transition-colors p-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl shadow-sm"
             title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
           >
             {isFullscreen ? (

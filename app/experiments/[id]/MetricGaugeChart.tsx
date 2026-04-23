@@ -121,7 +121,7 @@ export default function MetricGaugeChart({ metric, data, unit }: MetricGaugeChar
         animationEasing: 'cubicOut',
       },
     ],
-  }), [latestValue, gaugeMax, metric, unit]);
+  }), [latestValue, gaugeMax, metric]);
 
   const isEmpty = data.length === 0;
 
@@ -142,7 +142,7 @@ export default function MetricGaugeChart({ metric, data, unit }: MetricGaugeChar
           </div>
           <button
             onClick={toggleFullscreen}
-            className="text-green-500 hover:text-[#166534] transition-colors p-1.5 bg-green-100 hover:bg-green-200 border border-green-300 rounded-sm shadow-sm"
+            className="text-slate-500 hover:text-[#003366] transition-colors p-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl shadow-sm"
             title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
           >
             {isFullscreen ? (
