@@ -1,8 +1,8 @@
 import Link from "next/link";
 import ExperimentStream from "./ExperimentStream";
 import AIChat from "@/components/AIChat";
-import AIUpload from "./AIUpload";
-import MLPrediction from "./MLPrediction"; // ✅ NEW
+import AIUpload from "./AIUpload";          // ✅ added
+import MLPrediction from "./MLPrediction";  // ✅ added
 
 export default async function ExperimentPage({
   params,
@@ -38,7 +38,7 @@ export default async function ExperimentPage({
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen"> {/* ✅ fixed height */}
 
       {/* 🔷 LEFT SIDEBAR */}
       <div className="w-1/4 bg-[#d6eaf8] border-r-4 border-orange-400 p-4 flex flex-col">
@@ -58,10 +58,11 @@ export default async function ExperimentPage({
             <Link
               key={exp}
               href={`/experiments/${exp}`}
-              className={`p-3 rounded-lg block transition ${id === exp
+              className={`p-3 rounded-lg block transition ${
+                id === exp
                   ? "bg-orange-200 border-l-4 border-orange-500"
                   : "bg-white hover:bg-blue-50"
-                }`}
+              }`}
             >
               <p className="font-medium text-[#2c3e50]">
                 {exp.replace("-", " ").toUpperCase()}
@@ -72,8 +73,7 @@ export default async function ExperimentPage({
       </div>
 
       {/* 🔷 RIGHT CONTENT */}
-      <div className="flex-1 max-w-6xl mx-auto w-full py-8 px-6 text-slate-900 bg-[#f4f9fd] overflow-y-auto">
-
+      <div className="flex-1 max-w-6xl mx-auto w-full py-8 px-6 pb-32 text-slate-900 bg-[#f4f9fd] overflow-y-auto">
         {/* HEADER */}
         <div className="mb-6 border-b-2 border-slate-300 pb-4">
           <Link
@@ -116,10 +116,10 @@ export default async function ExperimentPage({
           />
         </div>
 
-        {/* AI UPLOAD */}
+        {/* 🔥 AI FILE ANALYSIS */}
         <AIUpload />
 
-        {/* 🔥 NEW ML PREDICTION */}
+        {/* 🔥 ML PREDICTION */}
         <MLPrediction />
 
       </div>
