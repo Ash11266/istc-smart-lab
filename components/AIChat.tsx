@@ -107,12 +107,12 @@ export default function AIChat({
   return (
     <div className="bg-white border p-6 flex flex-col h-full">
 
-      <h2 className="text-xl font-bold mb-4 text-[#003366]">AI Assistant</h2>
+      <h2 className="text-xl font-bold mb-4 text-[#166534]">AI Assistant</h2>
 
       {/* EMPTY STATE */}
       {messages.length === 0 ? (
-        <div className="border border-slate-200 p-8 mb-4 bg-slate-50 flex flex-col items-center justify-center flex-1 min-h-[384px]">
-          <p className="text-slate-600 mb-6 font-medium">
+        <div className="border border-green-200 p-8 mb-4 bg-green-50 flex flex-col items-center justify-center flex-1 min-h-[384px]">
+          <p className="text-green-600 mb-6 font-medium">
             Ask anything about this experiment
           </p>
 
@@ -126,7 +126,7 @@ export default function AIChat({
               <button
                 key={i}
                 onClick={() => sendMessage(q)}
-                className="bg-white px-4 py-2 text-sm text-[#003366] hover:bg-[#003366] hover:text-white border border-[#003366] transition-colors"
+                className="bg-white px-4 py-2 text-sm text-[#166534] hover:bg-[#166534] hover:text-white border border-[#166534] transition-colors"
               >
                 {q}
               </button>
@@ -134,7 +134,7 @@ export default function AIChat({
           </div>
         </div>
       ) : (
-        <div className="h-96 overflow-y-auto border border-slate-200 p-4 mb-4 bg-slate-50 space-y-4 flex-1 shadow-inner">
+        <div className="h-96 overflow-y-auto border border-green-200 p-4 mb-4 bg-green-50 space-y-4 flex-1 shadow-inner">
 
           {messages.map((msg, i) => {
             const suggestions = extractSuggestions(msg.text || "");
@@ -144,14 +144,14 @@ export default function AIChat({
 
                 {/* USER */}
                 {msg.role === "user" && (
-                  <div className="inline-block px-4 py-2 bg-[#003366] text-white max-w-[70%] shadow-sm">
+                  <div className="inline-block px-4 py-2 bg-[#166534] text-white max-w-[70%] shadow-sm">
                     {msg.text}
                   </div>
                 )}
 
                 {/* AI */}
                 {msg.role === "ai" && (
-                  <div className="inline-block px-4 py-3 bg-white border border-slate-200 shadow-sm text-left whitespace-pre-line max-w-[80%] relative">
+                  <div className="inline-block px-4 py-3 bg-white border border-green-200 shadow-sm text-left whitespace-pre-line max-w-[80%] relative">
 
                     {/* ✅ ONLY animate once */}
                     {msg.animated ? (
@@ -175,7 +175,7 @@ export default function AIChat({
                         onClick={() =>
                           navigator.clipboard.writeText(msg.text)
                         }
-                        className="absolute top-2 right-2 text-xs bg-slate-50 border border-slate-200 px-2 py-1 hover:bg-slate-200 flex items-center gap-1 transition-colors text-slate-600"
+                        className="absolute top-2 right-2 text-xs bg-green-50 border border-green-200 px-2 py-1 hover:bg-green-200 flex items-center gap-1 transition-colors text-green-600"
                       >
                         <Copy size={14} />
                         Copy
@@ -192,7 +192,7 @@ export default function AIChat({
                             <button
                               key={idx}
                               onClick={() => sendMessage(s)}
-                              className="text-sm px-3 py-1 bg-[#003366]/10 text-[#003366] hover:bg-[#003366]/20 transition-colors border border-[#003366]/20"
+                              className="text-sm px-3 py-1 bg-[#166534]/10 text-[#166534] hover:bg-[#166534]/20 transition-colors border border-[#166534]/20"
                             >
                               {s}
                             </button>
@@ -217,7 +217,7 @@ export default function AIChat({
       {/* INPUT */}
       <div className="flex gap-2">
         <input
-          className="flex-1 border border-slate-300 px-4 py-2 focus:outline-none focus:border-[#003366] focus:ring-1 focus:ring-[#003366] transition-all bg-slate-50"
+          className="flex-1 border border-green-300 px-4 py-2 focus:outline-none focus:border-[#166534] focus:ring-1 focus:ring-[#166534] transition-all bg-green-50"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask anything about this experiment..."
@@ -229,7 +229,7 @@ export default function AIChat({
         />
         <button
           onClick={() => sendMessage()}
-          className="bg-[#003366] text-white px-6 py-2 flex items-center gap-2 hover:bg-[#002244] transition-colors font-medium tracking-wide uppercase text-sm"
+          className="bg-[#166534] text-white px-6 py-2 flex items-center gap-2 hover:bg-[#14532d] transition-colors font-medium tracking-wide uppercase text-sm"
         >
           <Send size={16} />
           Send

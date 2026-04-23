@@ -2,6 +2,19 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  ShieldCheck,
+  UserPlus,
+  FileUp,
+  RotateCcw,
+  Mail,
+  User,
+  Lock,
+  Info,
+  CheckCircle,
+  AlertCircle,
+  RefreshCw
+} from "lucide-react";
 
 export default function AdminPanel() {
   const [name, setName] = useState("");
@@ -59,7 +72,7 @@ export default function AdminPanel() {
       setBulkError("Please select a file first");
       return;
     }
-    
+
     setIsBulkLoading(true);
     setBulkError("");
     setBulkSuccess("");
@@ -77,7 +90,6 @@ export default function AdminPanel() {
         const data = await res.json();
         setBulkSuccess(data.message || "Bulk import successful!");
         setFile(null);
-        // Reset file input value if needed (using uncontrolled input here so just clear state)
       } else {
         const data = await res.json();
         setBulkError(data.error || "Failed to import users");
@@ -118,161 +130,217 @@ export default function AdminPanel() {
   };
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="bg-[#003366] text-white p-6 rounded-lg shadow-sm border-l-4 border-amber-500">
-        <h1 className="text-3xl font-extrabold tracking-tight">Admin & Director Panel</h1>
-        <p className="mt-2 text-slate-300">Manage user accounts and lab accessibility.</p>
-      </div>
+    <div className="flex-1 overflow-y-auto bg-gradient-to-br from-[#f0fbfa]/80 to-white/80 p-8 md:p-12">
+      <div className="max-w-6xl mx-auto space-y-12">
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Single User Creation */}
-        <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-slate-200">
-          <h2 className="text-xl font-bold text-slate-800 mb-6 border-b pb-2">Single User Provisioning</h2>
-          
-          {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 text-sm flex items-center">
-              <span className="font-bold mr-2">Error:</span> {error}
+        {/* Admin Header Block */}
+        <div className="bg-[#0B5D57] text-white p-10 rounded-xl shadow-2xl border-l-[12px] border-orange-500 flex flex-col md:flex-row justify-between items-center gap-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+          <div className="relative z-10 flex items-center gap-6">
+            <div className="bg-white/10 p-5 rounded-xl backdrop-blur-md border border-white/20 shadow-inner">
+              <ShieldCheck size={48} className="text-orange-400" />
             </div>
-          )}
-
-          {successMessage && (
-            <div className="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 mb-6 text-sm flex items-center">
-              <span className="font-bold mr-2">Success:</span> {successMessage}
-            </div>
-          )}
-
-          <form onSubmit={handleSingleSubmit} className="space-y-6">
             <div>
-              <label className="block text-slate-700 text-sm font-bold mb-2 tracking-wider">Full Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/50 focus:border-[#003366]"
-                placeholder="Researcher Name"
-                required
-              />
+              <h1 className="text-4xl font-black tracking-tight uppercase">Admin Console</h1>
+              <p className="mt-2 text-teal-100/80 font-bold tracking-widest text-sm uppercase">Manage Personnel & Security Protocols</p>
             </div>
-
-            <div>
-              <label className="block text-slate-700 text-sm font-bold mb-2 tracking-wider">Email Address</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/50 focus:border-[#003366]"
-                placeholder="name@example.com"
-                required
-              />
-            </div>
-            
-            <div>
-              <label className="block text-slate-700 text-sm font-bold mb-2 tracking-wider">Temporary Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#003366]/50 focus:border-[#003366]"
-                placeholder="••••••••"
-                required
-                minLength={6}
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-[#003366] hover:bg-slate-900 text-white font-bold py-3 px-8 rounded transition-colors disabled:opacity-50 mt-4 shadow-sm uppercase tracking-wider"
-            >
-              {isLoading ? "Provisioning..." : "Create Account"}
-            </button>
-          </form>
+          </div>
         </div>
 
-        {/* Bulk User Creation */}
-        <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-slate-200">
-          <h2 className="text-xl font-bold text-slate-800 mb-6 border-b pb-2">Bulk User Import (Excel)</h2>
-          <p className="text-sm text-slate-600 mb-6 font-medium bg-slate-50 p-4 border border-slate-200 rounded">
-            Upload an `.xlsx` or `.csv` file. Ensure it contains exactly two column headers: <strong className="text-[#003366]">name</strong> and <strong className="text-[#003366]">email</strong>.<br/><br/>
-            All imported users will be assigned the default password: <code className="bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-mono">istc@12345</code>
-          </p>
-
-          {bulkError && (
-            <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 text-sm flex items-center">
-              <span className="font-bold mr-2">Error:</span> {bulkError}
-            </div>
-          )}
-
-          {bulkSuccess && (
-            <div className="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 mb-6 text-sm flex items-center">
-              <span className="font-bold mr-2">Success:</span> {bulkSuccess}
-            </div>
-          )}
-
-          <form onSubmit={handleBulkSubmit} className="space-y-6">
-            <div>
-              <label className="block text-slate-700 text-sm font-bold mb-2 tracking-wider">Select File</label>
-              <input
-                type="file"
-                accept=".xlsx, .xls, .csv"
-                onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
-                className="w-full bg-slate-50 border border-slate-300 rounded px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-[#003366] file:text-white hover:file:bg-slate-900"
-                required
-              />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+          {/* Single User Creation */}
+          <div className="bg-white/80 backdrop-blur-md p-10 rounded-xl shadow-xl border border-teal-50 flex flex-col hover:shadow-2xl transition-all">
+            <div className="flex items-center gap-4 mb-8 border-b border-teal-50 pb-6">
+              <UserPlus className="text-[#0B5D57]" size={28} />
+              <h2 className="text-2xl font-black text-slate-800">User Provisioning</h2>
             </div>
 
-            <button
-              type="submit"
-              disabled={isBulkLoading || !file}
-              className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded transition-colors disabled:opacity-50 mt-4 shadow-sm uppercase tracking-wider"
-            >
-              {isBulkLoading ? "Importing..." : "Process Import"}
-            </button>
-          </form>
+            {error && (
+              <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-8 rounded-r-xl flex items-center gap-3">
+                <AlertCircle size={20} />
+                <span className="font-bold">Error:</span> {error}
+              </div>
+            )}
+
+            {successMessage && (
+              <div className="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 mb-8 rounded-r-xl flex items-center gap-3">
+                <CheckCircle size={20} />
+                <span className="font-bold">Success:</span> {successMessage}
+              </div>
+            )}
+
+            <form onSubmit={handleSingleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-[#0B5D57] text-xs font-black uppercase tracking-widest ml-1">
+                  <User size={14} /> Full Name
+                </label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-[#0B5D57]/5 focus:border-[#0B5D57] transition-all"
+                  placeholder="Researcher Name"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-[#0B5D57] text-xs font-black uppercase tracking-widest ml-1">
+                  <Mail size={14} /> Email Address
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-[#0B5D57]/5 focus:border-[#0B5D57] transition-all"
+                  placeholder="name@lab.istc"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-[#0B5D57] text-xs font-black uppercase tracking-widest ml-1">
+                  <Lock size={14} /> Initial Token
+                </label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#0B5D57]/5 focus:border-[#0B5D57] transition-all"
+                  placeholder="••••••••"
+                  required
+                  minLength={6}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-[#0B5D57] hover:bg-slate-900 text-white font-black py-5 px-8 rounded-xl transition-all shadow-xl shadow-[#0B5D57]/10 flex items-center justify-center gap-3 uppercase tracking-widest active:scale-95 disabled:opacity-50"
+              >
+                {isLoading ? <RefreshCw className="animate-spin" /> : <UserPlus size={20} />}
+                {isLoading ? "Provisioning..." : "Initialize Account"}
+              </button>
+            </form>
+          </div>
+
+          {/* Bulk User Creation */}
+          <div className="bg-white/80 backdrop-blur-md p-10 rounded-xl shadow-xl border border-teal-50 flex flex-col hover:shadow-2xl transition-all">
+            <div className="flex items-center gap-4 mb-8 border-b border-teal-50 pb-6">
+              <FileUp className="text-orange-600" size={28} />
+              <h2 className="text-2xl font-black text-slate-800">Bulk Import</h2>
+            </div>
+
+            <div className="bg-orange-50 border border-orange-100 p-6 rounded-xl mb-8 flex items-start gap-4">
+              <Info className="text-orange-600 mt-1 shrink-0" size={20} />
+              <p className="text-sm text-orange-800 font-medium leading-relaxed">
+                Upload <strong className="font-black">.xlsx</strong> or <strong className="font-black">.csv</strong>. Use headers: <code className="bg-orange-200/50 px-1.5 rounded-xl font-black">name</code>, <code className="bg-orange-200/50 px-1.5 rounded-xl font-black">email</code>.<br />
+                Default Token: <code className="bg-orange-200/50 px-1.5 rounded-xl font-black font-mono">istc@12345</code>
+              </p>
+            </div>
+
+            {bulkError && (
+              <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-8 rounded-r-xl flex items-center gap-3">
+                <AlertCircle size={20} />
+                <span className="font-bold">Error:</span> {bulkError}
+              </div>
+            )}
+
+            {bulkSuccess && (
+              <div className="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 mb-8 rounded-r-xl flex items-center gap-3">
+                <CheckCircle size={20} />
+                <span className="font-bold">Success:</span> {bulkSuccess}
+              </div>
+            )}
+
+            <form onSubmit={handleBulkSubmit} className="space-y-8 flex-1 flex flex-col justify-between">
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-[#0B5D57] text-xs font-black uppercase tracking-widest ml-1">
+                  <FileUp size={14} /> Laboratory Manifest
+                </label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept=".xlsx, .xls, .csv"
+                    onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
+                    className="w-full bg-slate-50 border-2 border-dashed border-teal-200 rounded-xl px-5 py-8 text-slate-500 text-center cursor-pointer hover:bg-teal-50/50 transition-all file:hidden"
+                    required
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <span className="text-sm font-bold text-[#0B5D57]/60">
+                      {file ? file.name : "Click or drag to select dataset"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isBulkLoading || !file}
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-5 px-8 rounded-xl transition-all shadow-xl shadow-orange-500/20 flex items-center justify-center gap-3 uppercase tracking-widest active:scale-95 disabled:opacity-50"
+              >
+                {isBulkLoading ? <RefreshCw className="animate-spin" /> : <FileUp size={20} />}
+                {isBulkLoading ? "Processing..." : "Deploy Dataset"}
+              </button>
+            </form>
+          </div>
+
+          {/* Reset User Password */}
+          <div className="bg-white/80 backdrop-blur-md p-10 rounded-xl shadow-xl border border-teal-50 lg:col-span-2 hover:shadow-2xl transition-all">
+            <div className="flex items-center gap-4 mb-8 border-b border-teal-50 pb-6">
+              <RotateCcw className="text-slate-600" size={28} />
+              <h2 className="text-2xl font-black text-slate-800">Emergency Access Recovery</h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-10 items-center">
+              <div className="space-y-6">
+                <p className="text-slate-600 font-medium leading-relaxed bg-slate-50 p-6 rounded-xl border border-slate-100 italic">
+                  Reset a personnel token to the laboratory default in case of forgotten credentials. Personnel must re-authenticate and update their token immediately via the Profile interface.
+                </p>
+
+                {resetError && (
+                  <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-r-xl flex items-center gap-3">
+                    <AlertCircle size={20} />
+                    <span className="font-bold">Error:</span> {resetError}
+                  </div>
+                )}
+
+                {resetSuccess && (
+                  <div className="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded-r-xl flex items-center gap-3">
+                    <CheckCircle size={20} />
+                    <span className="font-bold">Success:</span> {resetSuccess}
+                  </div>
+                )}
+              </div>
+
+              <form onSubmit={handleResetSubmit} className="space-y-6">
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-[#0B5D57] text-xs font-black uppercase tracking-widest ml-1">
+                    <Mail size={14} /> Personnel Email
+                  </label>
+                  <input
+                    type="email"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-slate-500/5 focus:border-slate-500 transition-all"
+                    placeholder="name@lab.istc"
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isResetLoading}
+                  className="bg-slate-800 hover:bg-black text-white font-black py-4 px-10 rounded-xl transition-all shadow-xl flex items-center justify-center gap-3 uppercase tracking-widest active:scale-95 disabled:opacity-50"
+                >
+                  {isResetLoading ? <RefreshCw className="animate-spin" /> : <RotateCcw size={18} />}
+                  {isResetLoading ? "Resetting..." : "Restore Default Token"}
+                </button>
+              </form>
+            </div>
+          </div>
+
         </div>
-
-        {/* Reset User Password */}
-        <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-slate-200 lg:col-span-2">
-          <h2 className="text-xl font-bold text-slate-800 mb-6 border-b pb-2">Reset User Password</h2>
-          <p className="text-sm text-slate-600 mb-6 font-medium bg-slate-50 p-4 border border-slate-200 rounded">
-            Reset a user's password directly to the lab default (<code className="bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-mono">istc@12345</code>). They will be able to change it through their profile after logging in.
-          </p>
-
-          {resetError && (
-            <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 text-sm flex items-center">
-              <span className="font-bold mr-2">Error:</span> {resetError}
-            </div>
-          )}
-
-          {resetSuccess && (
-            <div className="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 mb-6 text-sm flex items-center">
-              <span className="font-bold mr-2">Success:</span> {resetSuccess}
-            </div>
-          )}
-
-          <form onSubmit={handleResetSubmit} className="space-y-6 max-w-xl">
-            <div>
-              <label className="block text-slate-700 text-sm font-bold mb-2 tracking-wider">User's Email</label>
-              <input
-                type="email"
-                value={resetEmail}
-                onChange={(e) => setResetEmail(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/50 focus:border-[#003366]"
-                placeholder="name@example.com"
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isResetLoading}
-              className="bg-[#003366] hover:bg-slate-900 text-white font-bold py-3 px-8 rounded transition-colors disabled:opacity-50 mt-4 shadow-sm uppercase tracking-wider"
-            >
-              {isResetLoading ? "Resetting..." : "Reset to Default"}
-            </button>
-          </form>
-        </div>
-
       </div>
     </div>
   );

@@ -54,27 +54,27 @@ export default function MetricStats({ data }: MetricStatsProps) {
   return (
     <div className="w-full h-full flex flex-col gap-6 p-2">
       <div className="flex flex-col pb-2">
-        <span className="text-slate-500 text-sm leading-none mb-2 font-bold uppercase tracking-widest">Latest Value</span>
-        <span className="font-mono text-5xl font-bold text-[#003366] truncate" title={latestValue}>{latestValue}</span>
+        <span className="text-green-500 text-sm leading-none mb-2 font-bold uppercase tracking-widest">Latest Value</span>
+        <span className="font-mono text-5xl font-bold text-[#166534] truncate" title={latestValue}>{latestValue}</span>
       </div>
 
       {!isEmpty && stats.avg !== '--' && (
         <div className="grid grid-cols-2 gap-x-4 gap-y-6">
           <div className="flex flex-col">
-            <span className="text-slate-500 text-xs leading-none mb-1 font-bold uppercase tracking-widest">AVG.</span>
-            <span className="font-mono text-2xl font-bold text-[#003366]">{stats.avg}</span>
+            <span className="text-green-500 text-xs leading-none mb-1 font-bold uppercase tracking-widest">AVG.</span>
+            <span className="font-mono text-2xl font-bold text-[#166534]">{stats.avg}</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-slate-500 text-xs leading-none mb-1 font-bold uppercase tracking-widest">ST DEV</span>
-            <span className="font-mono text-2xl font-bold text-[#003366]">{stats.stdev}</span>
+            <span className="text-green-500 text-xs leading-none mb-1 font-bold uppercase tracking-widest">ST DEV</span>
+            <span className="font-mono text-2xl font-bold text-[#166534]">{stats.stdev}</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-slate-500 text-xs leading-none mb-1 font-bold uppercase tracking-widest">MIN</span>
-            <span className="font-mono text-2xl font-bold text-[#003366]">{stats.min}</span>
+            <span className="text-green-500 text-xs leading-none mb-1 font-bold uppercase tracking-widest">MIN</span>
+            <span className="font-mono text-2xl font-bold text-[#166534]">{stats.min}</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-slate-500 text-xs leading-none mb-1 font-bold uppercase tracking-widest">MAX</span>
-            <span className="font-mono text-2xl font-bold text-[#003366]">{stats.max}</span>
+            <span className="text-green-500 text-xs leading-none mb-1 font-bold uppercase tracking-widest">MAX</span>
+            <span className="font-mono text-2xl font-bold text-[#166534]">{stats.max}</span>
           </div>
         </div>
       )}
