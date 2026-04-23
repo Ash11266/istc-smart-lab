@@ -13,9 +13,10 @@ type MqttMessage = {
 interface MetricScatterChartProps {
   metric: string;
   data: MqttMessage[];
+  unit?: string;
 }
 
-export default function MetricScatterChart({ metric, data }: MetricScatterChartProps) {
+export default function MetricScatterChart({ metric, data, unit }: MetricScatterChartProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -58,7 +59,7 @@ export default function MetricScatterChart({ metric, data }: MetricScatterChartP
           if (!pt) return '';
           const date = new Date(pt[0]);
           const timeStr = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
-          return `${timeStr}<br/>${params.seriesName}: <b>${pt[1]}</b>`;
+          return `${timeStr}<br/>${params.seriesName}: <b>${pt[1]}${unit ? ' ' + unit : ''}</b>`;
         }
       },
       grid: {
@@ -87,7 +88,11 @@ export default function MetricScatterChart({ metric, data }: MetricScatterChartP
         splitLine: { show: true, lineStyle: { color: '#e2e8f0', type: 'solid' } },
         axisLine: { show: true, lineStyle: { color: '#64748b' } },
         axisTick: { show: true, lineStyle: { color: '#64748b' } },
-        axisLabel: { color: '#475569', fontSize: 11 }
+        axisLabel: { 
+          color: '#475569', 
+          fontSize: 11,
+          formatter: (value: any) => unit ? `${value} ${unit}` : value
+        }
       },
       series: [
         {
