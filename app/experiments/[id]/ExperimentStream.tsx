@@ -91,6 +91,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
 
   function connect() {
     if (connected) return;
+    setData([]); // Clear old data when starting a new connection
 
     const wsHost = process.env.NEXT_PUBLIC_WS_HOST === 'localhost' ? window.location.hostname : process.env.NEXT_PUBLIC_WS_HOST;
     const ws = new WebSocket(
@@ -433,7 +434,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
       </div>
 
       {/* Metric Charts */}
-      {metricsToDisplay.length > 0 && (
+      {connected && metricsToDisplay.length > 0 && (
         <div className="flex flex-col gap-6 w-full mt-4 mb-2">
 
           {metricsToDisplay.map((metric) => {
