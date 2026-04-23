@@ -54,7 +54,7 @@ export default async function RootLayout({
 
           <nav className="flex items-center gap-4 z-10">
             {isLoggedIn && (
-              <Link 
+              <Link
                 href="/experiments"
                 className="px-4 py-2 text-sm font-semibold text-white border-2 border-white/20 rounded-lg hover:bg-white/10 hover:border-white/40 transition-all"
               >
@@ -62,14 +62,14 @@ export default async function RootLayout({
               </Link>
             )}
             {isAdmin && (
-              <Link 
+              <Link
                 href="/admin"
                 className="px-4 py-2 text-sm font-semibold text-white bg-orange-500 border-2 border-orange-500 rounded-lg hover:bg-orange-600 hover:border-orange-600 transition-all shadow-md shadow-orange-500/20"
               >
                 Admin Panel
               </Link>
             )}
-            <Link 
+            <Link
               href="/profile"
               className="px-4 py-2 text-sm font-semibold text-[#0B5D57] bg-white rounded-lg hover:bg-orange-50 transition-colors shadow-sm"
             >
