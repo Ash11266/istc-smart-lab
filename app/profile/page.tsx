@@ -54,7 +54,7 @@ export default async function ProfilePage() {
 
         <div className="grid md:grid-cols-3 gap-8">
           {/* Account Info Block */}
-          <div className="md:col-span-2 bg-white/70 backdrop-blur-md p-8 rounded-xl shadow-lg border border-teal-100 flex flex-col">
+          <div className="md:col-span-3 bg-white/70 backdrop-blur-md p-8 rounded-xl shadow-lg border border-teal-100 flex flex-col">
             <div className="flex items-center gap-3 mb-8 border-b border-teal-50 pb-4">
               <User className="text-[#0B5D57]" size={24} />
               <h2 className="text-2xl font-bold text-slate-800">Account Details</h2>
@@ -100,25 +100,6 @@ export default async function ProfilePage() {
                   </span>
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Quick Actions or Sidebar Info */}
-          <div className="space-y-8">
-            <div className="bg-[#0B5D57] p-8 rounded-xl shadow-lg text-white relative overflow-hidden group">
-              <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-orange-500/20 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500"></div>
-              <h3 className="text-lg font-bold mb-4 relative z-10">Laboratory ID</h3>
-              <p className="text-teal-100/70 text-sm mb-4 relative z-10">Your unique identifier for experimental data logging and system access.</p>
-              <div className="bg-black/20 p-4 rounded-xl font-mono text-orange-300 text-center border border-white/10 relative z-10">
-                ID-{session.userId.toString().padStart(6, '0')}
-              </div>
-            </div>
-
-            <div className="bg-white/70 backdrop-blur-md p-8 rounded-xl shadow-lg border border-teal-100">
-              <h3 className="text-lg font-bold text-slate-800 mb-4">Security</h3>
-              <p className="text-slate-500 text-sm leading-relaxed">
-                Ensure your account remains secure by using a strong password and updating it regularly.
-              </p>
             </div>
           </div>
         </div>
