@@ -99,17 +99,15 @@ export default async function ExperimentPage({
 
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b-4 border-orange-500 pb-8">
               <div className="space-y-2">
-                <div className="flex items-center gap-3 text-orange-600">
-                  <Beaker size={24} />
-                  <span className="text-xs font-black uppercase tracking-[0.2em]">Research Profile</span>
-                </div>
                 <h1 className="text-4xl md:text-5xl font-black text-[#0B5D57] tracking-tight">
                   {experiment.name}
                 </h1>
               </div>
               <div className="flex items-center gap-4">
-                {experiment.is_private && (
-                  <span className="bg-orange-100 text-orange-700 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border border-orange-200">Private Access</span>
+                {!!experiment?.is_private && (
+                  <span className="bg-orange-100 text-orange-700 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border border-orange-200">
+                    Private
+                  </span>
                 )}
                 <div className="bg-teal-50 text-[#0B5D57] px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border border-teal-100">Live Stream</div>
               </div>
@@ -169,8 +167,8 @@ export default async function ExperimentPage({
                   <div className="flex items-center gap-3 border-b border-teal-50 pb-6">
                     <Brain size={32} className="text-[#0B5D57]" />
                     <div>
-                      <h2 className="text-2xl font-black text-slate-800">Cognitive Lab Assistant</h2>
-                      <p className="text-sm text-slate-500 font-bold uppercase tracking-widest">AI Synthesis & Inference</p>
+                      <h2 className="text-2xl font-black text-slate-800">AI Lab Assistant</h2>
+                      {/*<p className="text-sm text-slate-500 font-bold uppercase tracking-widest">AI Synthesis & Inference</p>*/}
                     </div>
                   </div>
 
