@@ -1,16 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 export default function AIUpload() {
   const [file, setFile] = useState<File | null>(null);
-  const [report, setReport] = useState<any>(null);
+  const [reportText, setReportText] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleUpload = async () => {
     if (!file) return alert("Select file first");
 
     setLoading(true);
+    setReportText(null);
 
     try {
       const formData = new FormData();
@@ -24,7 +26,7 @@ export default function AIUpload() {
       if (!res.ok) throw new Error("API failed");
 
       const data = await res.json();
-      setReport(data);
+      setReportText(data.report);
 
     } catch (err) {
       console.error(err);
@@ -50,32 +52,43 @@ export default function AIUpload() {
       html2canvas: { scale: 2 },
       jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
-    html2pdf().set(opt as any).from(element).save();
+
+    html2pdf().set(opt).from(element).save();
   };
 
   return (
-    <div className="bg-white border p-6 mt-6 rounded-lg shadow-sm">
-      <h2 className="text-xl font-bold mb-4">AI Data Analysis</h2>
+    <div className="bg-white border p-6 mt-6 rounded-xl shadow-sm">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">AI Report</h2>
+        {reportText && (
+          <button
+            onClick={handleDownload}
+            style={{ backgroundColor: "#0B5D57", color: "white" }}
+            className="px-4 py-2 rounded-xl shadow font-bold transition-transform hover:scale-105 hover:shadow-lg"
+          >
+            Download from here in PDF form
+          </button>
+        )}
+      </div>
 
       <input
         type="file"
         onChange={(e) => setFile(e.target.files?.[0] || null)}
-        className="mb-4"
+        className="mb-4 block"
       />
 
       <button
         onClick={handleUpload}
         disabled={loading}
-        className="bg-orange-400 text-white px-4 py-2 rounded"
+        style={{ backgroundColor: loading ? "#9ca3af" : "#f97316" }}
+        className="px-4 py-2 mt-2 rounded-xl text-white font-bold transition-transform shadow hover:scale-105 hover:shadow-lg"
       >
-        {loading ? "Processing..." : "Generate AI Report"}
+        {loading ? "Generating Comprehensive Report..." : "Generate AI Report"}
       </button>
 
-      {report && (
-        <div className="mt-4 p-4 bg-blue-50 rounded">
-          <p><b>Summary:</b> {report.summary}</p>
-          <p><b>Anomaly:</b> {report.anomaly}</p>
-          <p><b>Suggestion:</b> {report.suggestion}</p>
+      {reportText && (
+        <div id="ai-report-content" className="mt-6 p-6 bg-blue-50/50 rounded-xl border border-blue-100 prose prose-blue max-w-none">
+          <ReactMarkdown>{reportText}</ReactMarkdown>
         </div>
       )}
     </div>

@@ -36,10 +36,10 @@ export default async function ProfilePage() {
       <div className="max-w-4xl mx-auto space-y-8">
         
         {/* Profile Header Block */}
-        <div className="bg-[#0B5D57] text-white p-8 rounded-2xl shadow-xl border-l-[8px] border-orange-500 flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden">
+        <div className="bg-[#0B5D57] text-white p-8 rounded-xl shadow-xl border-l-[8px] border-orange-500 flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
           <div className="relative z-10 flex items-center gap-6">
-            <div className="bg-white/20 p-4 rounded-2xl backdrop-blur-md border border-white/30 shadow-inner">
+            <div className="bg-white/20 p-4 rounded-xl backdrop-blur-md border border-white/30 shadow-inner">
               <UserCircle size={48} className="text-orange-300" />
             </div>
             <div>
@@ -54,7 +54,7 @@ export default async function ProfilePage() {
 
         <div className="grid md:grid-cols-3 gap-8">
           {/* Account Info Block */}
-          <div className="md:col-span-2 bg-white/70 backdrop-blur-md p-8 rounded-2xl shadow-lg border border-teal-100 flex flex-col">
+          <div className="md:col-span-2 bg-white/70 backdrop-blur-md p-8 rounded-xl shadow-lg border border-teal-100 flex flex-col">
             <div className="flex items-center gap-3 mb-8 border-b border-teal-50 pb-4">
               <User className="text-[#0B5D57]" size={24} />
               <h2 className="text-2xl font-bold text-slate-800">Account Details</h2>
@@ -106,7 +106,7 @@ export default async function ProfilePage() {
 
           {/* Quick Actions or Sidebar Info */}
           <div className="space-y-8">
-             <div className="bg-[#0B5D57] p-8 rounded-2xl shadow-lg text-white relative overflow-hidden group">
+             <div className="bg-[#0B5D57] p-8 rounded-xl shadow-lg text-white relative overflow-hidden group">
                 <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-orange-500/20 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500"></div>
                 <h3 className="text-lg font-bold mb-4 relative z-10">Laboratory ID</h3>
                 <p className="text-teal-100/70 text-sm mb-4 relative z-10">Your unique identifier for experimental data logging and system access.</p>
@@ -115,7 +115,7 @@ export default async function ProfilePage() {
                 </div>
              </div>
              
-             <div className="bg-white/70 backdrop-blur-md p-8 rounded-2xl shadow-lg border border-teal-100">
+             <div className="bg-white/70 backdrop-blur-md p-8 rounded-xl shadow-lg border border-teal-100">
                 <h3 className="text-lg font-bold text-slate-800 mb-4">Security</h3>
                 <p className="text-slate-500 text-sm leading-relaxed">
                   Ensure your account remains secure by using a strong password and updating it regularly. 

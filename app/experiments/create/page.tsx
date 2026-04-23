@@ -71,7 +71,7 @@ console.log("API RESPONSE:", data);
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="block w-full px-4 py-3 border border-slate-400 bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#003366] focus:border-[#003366] rounded-none shadow-sm"
+              className="block w-full px-4 py-3 border border-slate-400 bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#003366] focus:border-[#003366] rounded-xl shadow-sm"
             />
           </div>
 
@@ -85,7 +85,7 @@ console.log("API RESPONSE:", data);
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={5}
-              className="block w-full px-4 py-3 border border-slate-400 bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#003366] focus:border-[#003366] rounded-none shadow-sm resize-y"
+              className="block w-full px-4 py-3 border border-slate-400 bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#003366] focus:border-[#003366] rounded-xl shadow-sm resize-y"
             />
           </div>
 
@@ -102,7 +102,7 @@ console.log("API RESPONSE:", data);
               placeholder="e.g. Raspberry Pi, DHT11 Sensor, ESP32"
               value={components}
               onChange={(e) => setComponents(e.target.value)}
-              className="block w-full px-4 py-3 border border-slate-400 bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#003366] focus:border-[#003366] rounded-none shadow-sm"
+              className="block w-full px-4 py-3 border border-slate-400 bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#003366] focus:border-[#003366] rounded-xl shadow-sm"
             />
           </div>
 
@@ -119,7 +119,7 @@ console.log("API RESPONSE:", data);
               placeholder="e.g. temperature, humidity, voc"
               value={dataValues}
               onChange={(e) => setDataValues(e.target.value)}
-              className="block w-full px-4 py-3 border border-slate-400 bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#003366] focus:border-[#003366] rounded-none shadow-sm"
+              className="block w-full px-4 py-3 border border-slate-400 bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#003366] focus:border-[#003366] rounded-xl shadow-sm"
             />
           </div>
 
@@ -129,7 +129,7 @@ console.log("API RESPONSE:", data);
               type="checkbox"
               checked={isPrivate}
               onChange={(e) => setIsPrivate(e.target.checked)}
-              className="w-5 h-5 text-[#003366] rounded-sm focus:ring-[#003366] border-slate-400"
+              className="w-5 h-5 text-[#003366] rounded-xl focus:ring-[#003366] border-slate-400"
             />
             <label htmlFor="isPrivate" className="block text-sm font-bold text-slate-900">
               Make this experiment private

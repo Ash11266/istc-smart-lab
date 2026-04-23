@@ -49,7 +49,7 @@ export default async function ExperimentPage({
   if (isForbidden) {
     return (
       <div className="flex-1 flex items-center justify-center p-6">
-        <div className="max-w-md w-full bg-white border-2 border-red-500 p-10 rounded-3xl shadow-2xl text-center space-y-6">
+        <div className="max-w-md w-full bg-white border-2 border-red-500 p-10 rounded-xl shadow-2xl text-center space-y-6">
           <div className="bg-red-100 w-20 h-20 rounded-full flex items-center justify-center text-red-600 mx-auto">
              <Info size={40} />
           </div>
@@ -118,7 +118,7 @@ export default async function ExperimentPage({
 
           {/* INFO */}
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white/70 backdrop-blur-md border border-teal-50 p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all group">
+            <div className="bg-white/70 backdrop-blur-md border border-teal-50 p-8 rounded-xl shadow-xl hover:shadow-2xl transition-all group">
               <div className="flex items-center gap-3 mb-6">
                  <div className="bg-teal-100 p-2 rounded-xl text-[#0B5D57] group-hover:bg-[#0B5D57] group-hover:text-white transition-colors">
                     <Info size={20} />
@@ -130,22 +130,22 @@ export default async function ExperimentPage({
               </p>
             </div>
 
-            <div className="bg-white/70 backdrop-blur-md border border-teal-50 p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all group">
+            <div className="bg-white/70 backdrop-blur-md border border-teal-50 p-8 rounded-xl shadow-xl hover:shadow-2xl transition-all group">
               <div className="flex items-center gap-3 mb-6">
                  <div className="bg-orange-100 p-2 rounded-xl text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-colors">
                     <Beaker size={20} />
                  </div>
                  <h2 className="text-xl font-black text-slate-800">Components</h2>
               </div>
-              <p className="text-slate-600 leading-relaxed font-mono text-sm bg-slate-50 p-4 rounded-2xl border border-slate-100">
+              <p className="text-slate-600 leading-relaxed font-mono text-sm bg-slate-50 p-4 rounded-xl border border-slate-100">
                  {experiment.components || "Standard laboratory assembly."}
               </p>
             </div>
           </div>
 
           {/* LIVE DATA */}
-          <div className="bg-white border-2 border-teal-100 p-1 rounded-[2.5rem] shadow-2xl overflow-hidden">
-             <div className="bg-[#0B5D57] p-6 rounded-[2.2rem] flex items-center justify-between">
+          <div className="bg-white border-2 border-teal-100 p-1 rounded-xl shadow-2xl overflow-hidden">
+             <div className="bg-[#0B5D57] p-6 rounded-xl flex items-center justify-between">
                 <div className="flex items-center gap-3 text-white">
                    <Activity size={24} className="text-orange-400" />
                    <h2 className="text-xl font-black tracking-tight uppercase">Live Telemetry Stream</h2>
@@ -163,8 +163,8 @@ export default async function ExperimentPage({
           {/* AI SECTION */}
           <div className="grid grid-cols-1 lg:grid-cols-1 gap-8 mt-12">
             <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-[#0B5D57] to-orange-500 rounded-[2rem] blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-              <div className="relative bg-white border border-teal-50 p-2 rounded-[2rem] shadow-xl">
+              <div className="absolute -inset-1 bg-gradient-to-r from-[#0B5D57] to-orange-500 rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+              <div className="relative bg-white border border-teal-50 p-2 rounded-xl shadow-xl">
                  <div className="p-8 space-y-8">
                     <div className="flex items-center gap-3 border-b border-teal-50 pb-6">
                        <Brain size={32} className="text-[#0B5D57]" />

@@ -58,7 +58,7 @@ export default function Home() {
         <motion.div 
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="px-12 py-5 bg-gradient-to-r from-orange-500 to-orange-600 text-white text-2xl font-black rounded-2xl shadow-[0_10px_30px_rgba(249,115,22,0.4)] transition-all"
+          className="px-12 py-5 bg-gradient-to-r from-orange-500 to-orange-600 text-white text-2xl font-black rounded-xl shadow-[0_10px_30px_rgba(249,115,22,0.4)] transition-all"
         >
           {isLoggedIn ? "Enter Experiments" : "Enter System"}
         </motion.div>

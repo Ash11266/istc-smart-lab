@@ -44,10 +44,10 @@ function LoginForm() {
   };
 
   return (
-    <div className="relative z-10 w-full max-w-lg bg-white/90 backdrop-blur-xl p-10 rounded-[2.5rem] shadow-2xl border border-white/50 space-y-8">
+    <div className="relative z-10 w-full max-w-lg bg-white/90 backdrop-blur-xl p-10 rounded-xl shadow-2xl border border-white/50 space-y-8">
       {/* HEADER */}
       <div className="text-center space-y-2">
-        <div className="bg-[#0B5D57] w-16 h-16 rounded-2xl flex items-center justify-center text-white mx-auto shadow-lg shadow-[#0B5D57]/20 mb-4">
+        <div className="bg-[#0B5D57] w-16 h-16 rounded-xl flex items-center justify-center text-white mx-auto shadow-lg shadow-[#0B5D57]/20 mb-4">
            <ShieldCheck size={32} />
         </div>
         <h1 className="text-4xl font-black text-[#0B5D57] tracking-tight">
@@ -76,7 +76,7 @@ function LoginForm() {
             <input
               type="email"
               placeholder="researcher@lab.istc"
-              className="w-full pl-4 pr-4 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50/50 focus:bg-white focus:border-[#0B5D57] focus:ring-4 focus:ring-[#0B5D57]/5 outline-none transition-all font-medium text-slate-900"
+              className="w-full pl-4 pr-4 py-4 rounded-xl border-2 border-slate-100 bg-slate-50/50 focus:bg-white focus:border-[#0B5D57] focus:ring-4 focus:ring-[#0B5D57]/5 outline-none transition-all font-medium text-slate-900"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -91,7 +91,7 @@ function LoginForm() {
           <input
             type="password"
             placeholder="••••••••••••"
-            className="w-full pl-4 pr-4 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50/50 focus:bg-white focus:border-[#0B5D57] focus:ring-4 focus:ring-[#0B5D57]/5 outline-none transition-all font-medium text-slate-900"
+            className="w-full pl-4 pr-4 py-4 rounded-xl border-2 border-slate-100 bg-slate-50/50 focus:bg-white focus:border-[#0B5D57] focus:ring-4 focus:ring-[#0B5D57]/5 outline-none transition-all font-medium text-slate-900"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -101,7 +101,7 @@ function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-orange-500/20 transition-all duration-300 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 group disabled:opacity-70"
+          className="w-full bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-xl font-black text-lg shadow-xl shadow-orange-500/20 transition-all duration-300 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 group disabled:opacity-70"
         >
           {loading ? (
             <>
@@ -136,7 +136,7 @@ export default function LoginPage() {
       <div className="absolute inset-0 bg-black/5"></div>
 
       <Suspense fallback={
-        <div className="relative z-10 bg-white/50 backdrop-blur-md p-10 rounded-[2.5rem] flex flex-col items-center gap-4">
+        <div className="relative z-10 bg-white/50 backdrop-blur-md p-10 rounded-xl flex flex-col items-center gap-4">
            <div className="w-12 h-12 border-4 border-[#0B5D57] border-t-transparent rounded-full animate-spin"></div>
            <p className="text-[#0B5D57] font-bold">Secure Connection Established...</p>
         </div>

@@ -185,7 +185,7 @@ export default function MetricDialChart({ metric, data, unit }: MetricDialChartP
           </div>
           <button
             onClick={toggleFullscreen}
-            className="text-slate-500 hover:text-[#003366] transition-colors p-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-sm shadow-sm"
+            className="text-slate-500 hover:text-[#003366] transition-colors p-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl shadow-sm"
             title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
           >
             {isFullscreen ? (

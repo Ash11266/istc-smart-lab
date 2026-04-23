@@ -80,14 +80,14 @@ export default function ExperimentsPage() {
                     placeholder="Search experiment..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="mb-3 px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0B5D57]"
+                    className="mb-3 px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0B5D57]"
                 />
 
                 {/* 🔥 CREATE BUTTON */}
                 {isLoggedIn && (
                     <Link
                         href="/experiments/create"
-                        className="mb-4 text-center bg-white-500 hover:bg-orange-600 text-orange font-bold py-2 px-4 rounded-lg shadow-lg shadow-orange-300/50 hover:shadow-orange-400/70 transition transform hover:scale-105"
+                        className="mb-4 text-center bg-white-500 hover:bg-orange-600 text-orange font-bold py-2 px-4 rounded-xl shadow-lg shadow-orange-300/50 hover:shadow-orange-400/70 transition transform hover:scale-105"
                     >
                         + Create Experiment
                     </Link>
@@ -121,7 +121,7 @@ export default function ExperimentsPage() {
                                 {isAdmin && (
                                     <button
                                         onClick={(e) => handleDelete(e, exp.uuid)}
-                                        className="hidden group-hover:block bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600 transition"
+                                        className="hidden group-hover:block bg-red-500 text-white text-xs px-2 py-1 rounded-xl hover:bg-red-600 transition"
                                     >
                                         Delete
                                     </button>

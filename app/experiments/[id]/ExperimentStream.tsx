@@ -27,6 +27,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
   const [data, setData] = useState<MqttMessage[]>([]);
   const [connected, setConnected] = useState(false);
   const [socket, setSocket] = useState<WebSocket | null>(null);
+  const [controlSocket, setControlSocket] = useState<WebSocket | null>(null);
 
   const [deviceInput, setDeviceInput] = useState("");
   const [selectedDevice, setSelectedDevice] = useState("");
@@ -83,8 +84,9 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
   function connect() {
     if (connected) return;
 
+    const wsPath = process.env.NEXT_PUBLIC_WS_PATH || "/mqtt-stream";
     const ws = new WebSocket(
-      `ws://${process.env.NEXT_PUBLIC_WS_HOST}:${process.env.NEXT_PUBLIC_WS_PORT}${process.env.NEXT_PUBLIC_WS_PATH}`
+      `ws://${process.env.NEXT_PUBLIC_WS_HOST}:${process.env.NEXT_PUBLIC_WS_PORT}${wsPath}`
     );
 
     ws.onopen = () => setConnected(true);
@@ -115,10 +117,22 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
 
     ws.onclose = () => setConnected(false);
     setSocket(ws);
+
+    const controlPath = process.env.NEXT_PUBLIC_WS_CONTROL_PATH || "/control";
+    const cWs = new WebSocket(
+      `ws://${process.env.NEXT_PUBLIC_WS_HOST}:${process.env.NEXT_PUBLIC_WS_PORT}${controlPath}`
+    );
+    
+    cWs.onopen = () => console.log("Control WebSocket connected to", controlPath);
+    cWs.onerror = (err) => console.error("Control WebSocket error", err);
+    cWs.onclose = () => console.log("Control WebSocket closed");
+    
+    setControlSocket(cWs);
   }
 
   function disconnect() {
     socket?.close();
+    controlSocket?.close();
     setConnected(false);
   }
 
@@ -128,15 +142,15 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
   }
 
   function sendControlCommand(device: string, command: string) {
-    if (socket && connected) {
-      socket.send(JSON.stringify({
+    if (controlSocket && controlSocket.readyState === WebSocket.OPEN) {
+      controlSocket.send(JSON.stringify({
         action: "command",
         device,
         command,
         timestamp: new Date().toISOString()
       }));
     } else {
-      console.warn("WebSocket is not connected.");
+      console.warn("Control WebSocket is not connected or not ready. State:", controlSocket?.readyState);
     }
   }
 
@@ -161,23 +175,29 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
       {/* CONTROLS */}
       <div className="flex gap-3 flex-wrap">
         <button onClick={downloadCSV} className="px-4 py-2 border bg-white text-[#003366] hover:bg-slate-50 transition-colors">Export CSV</button>
-        <button onClick={connect} className="px-4 py-2 bg-[#003366] text-white hover:bg-slate-800 transition-colors">Connect</button>
+        <button 
+          onClick={connect} 
+          disabled={connected}
+          className={`px-4 py-2 text-white transition-all ${connected ? "bg-slate-400 opacity-50 cursor-not-allowed" : "bg-[#003366] hover:bg-slate-800"}`}
+        >
+          Connect
+        </button>
         <button onClick={disconnect} className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 transition-colors">Disconnect</button>
       </div>
 
       {/* FILTER */}
       <div className="flex gap-2">
-        <input 
-          value={deviceInput} 
-          onChange={(e) => setDeviceInput(e.target.value)} 
-          placeholder="Device filter (leave empty for all)" 
-          className="border p-2 flex-1 max-w-md focus:outline-none focus:ring-2 focus:ring-[#003366]" 
+        <input
+          value={deviceInput}
+          onChange={(e) => setDeviceInput(e.target.value)}
+          placeholder="Device filter (leave empty for all)"
+          className="border p-2 flex-1 max-w-md focus:outline-none focus:ring-2 focus:ring-[#003366]"
         />
         <button onClick={applyDeviceFilter} className="bg-[#003366] text-white px-6 hover:bg-slate-800 transition-colors">Apply</button>
       </div>
 
       {/* CONTROL TOOLS */}
-      <div className="bg-slate-50 p-6 border border-slate-300 flex flex-col justify-center items-center gap-4 text-center rounded-sm">
+      <div className="bg-slate-50 p-6 border border-slate-300 flex flex-col justify-center items-center gap-4 text-center rounded-xl">
         <span className="text-xl font-bold text-[#003366]">Control Tools</span>
 
         <div className="text-sm font-medium text-slate-600">
@@ -328,7 +348,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
                           [metric]: value
                         }));
                       }}
-                      className="border border-slate-300 rounded px-2 py-1 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#003366]"
+                      className="border border-slate-300 rounded-xl px-2 py-1 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#003366]"
                     >
                       <option value="line">Line</option>
                       <option value="gauge">Gauge</option>
@@ -351,7 +371,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
                           [metric]: e.target.value
                         }));
                       }}
-                      className="border border-slate-300 rounded px-2 py-1 w-24 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#003366]"
+                      className="border border-slate-300 rounded-xl px-2 py-1 w-24 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#003366]"
                     />
                   </div>
                 </div>
@@ -387,7 +407,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
       </div>
 
       {/* TERMINAL */}
-      <div className="bg-black text-white p-4 h-60 overflow-y-auto mb-6 rounded-sm">
+      <div className="bg-black text-white p-4 h-60 overflow-y-auto mb-6 rounded-xl">
         {data.length === 0 && <span className="text-slate-500 italic text-sm">No data received yet...</span>}
         {data.map((d, i) => (
           <div key={i} className="text-sm font-mono opacity-80 hover:opacity-100 transition-opacity">
@@ -399,4 +419,4 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
       </div>
     </div>
   );
-}
+}

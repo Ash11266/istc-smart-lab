@@ -132,7 +132,7 @@ export default function ExperimentsPage() {
                   setSelectedId(exp.uuid);
                   router.push(`/experiments/${exp.uuid}`);
                 }}
-                className={`group p-4 rounded-2xl cursor-pointer transition-all duration-300 shadow-sm flex justify-between items-center border
+                className={`group p-4 rounded-xl cursor-pointer transition-all duration-300 shadow-sm flex justify-between items-center border
                   ${isActive
                     ? "bg-[#d1f2eb] border-[#0B5D57] scale-[1.02] shadow-md"
                     : "bg-white/70 border-teal-50 hover:bg-white hover:scale-[1.03] hover:shadow-lg border-l-4 border-l-transparent hover:border-l-[#0B5D57]"
@@ -157,7 +157,7 @@ export default function ExperimentsPage() {
                 {isAdmin && (
                   <button
                     onClick={(e) => handleDelete(e, exp.uuid)}
-                    className="opacity-0 group-hover:opacity-100 p-2 text-red-400 hover:text-red-600 transition-all hover:bg-red-50 rounded-lg"
+                    className="opacity-0 group-hover:opacity-100 p-2 text-red-400 hover:text-red-600 transition-all hover:bg-red-50 rounded-xl"
                     title="Delete Experiment"
                   >
                     <Trash2 size={16} />
@@ -168,7 +168,7 @@ export default function ExperimentsPage() {
           })}
 
           {filteredExperiments.length === 0 && !loading && (
-            <div className="text-center p-8 bg-white/30 rounded-2xl border border-dashed border-teal-200">
+            <div className="text-center p-8 bg-white/30 rounded-xl border border-dashed border-teal-200">
               <Beaker className="mx-auto text-teal-300 mb-2" size={32} />
               <p className="text-slate-500 text-sm italic">No experiments found.</p>
             </div>

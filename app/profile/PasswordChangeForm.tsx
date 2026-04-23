@@ -56,7 +56,7 @@ export default function PasswordChangeForm() {
   };
 
   return (
-    <div className="bg-white/70 backdrop-blur-md p-8 rounded-2xl shadow-lg border border-teal-100">
+    <div className="bg-white/70 backdrop-blur-md p-8 rounded-xl shadow-lg border border-teal-100">
       <div className="flex items-center gap-3 mb-8 border-b border-teal-50 pb-4">
         <Lock className="text-[#0B5D57]" size={24} />
         <h2 className="text-2xl font-bold text-slate-800">Change Password</h2>

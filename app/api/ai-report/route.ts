@@ -57,6 +57,7 @@ ${truncatedData}
     );
 
     const data = await response.json();
+    console.log("=== GEMINI API RESPONSE ===", JSON.stringify(data, null, 2));
 
     if (data.error) {
       return NextResponse.json({

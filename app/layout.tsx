@@ -4,6 +4,9 @@ import BackgroundVideo from "./components/BackgroundVideo";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
+import { Inter } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Data Acquisition & Monitoring System",
@@ -32,7 +35,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className="min-h-screen flex flex-col bg-[#e6edf3] text-black">
+      <body className={`min-h-screen flex flex-col bg-[#e6edf3] text-black ${inter.className}`}>
 
         <header
           className="w-full h-24 flex items-center justify-between px-6 relative shadow-md border-b-[5px] border-orange-400"
@@ -43,7 +46,7 @@ export default async function RootLayout({
               <img
                 src="/logo.png"
                 alt="logo"
-                className="h-14 w-14 bg-white rounded-md p-1 shadow hover:scale-105 transition-transform"
+                className="h-14 w-14 bg-white rounded-xl p-1 shadow hover:scale-105 transition-transform"
               />
             </Link>
           </div>
@@ -56,7 +59,7 @@ export default async function RootLayout({
             {isLoggedIn && (
               <Link
                 href="/experiments"
-                className="px-4 py-2 text-sm font-semibold text-white border-2 border-white/20 rounded-lg hover:bg-white/10 hover:border-white/40 transition-all"
+                className="px-4 py-2 text-sm font-semibold text-white border-2 border-white/20 rounded-xl hover:bg-white/10 hover:border-white/40 transition-all"
               >
                 Experiments
               </Link>
@@ -64,14 +67,14 @@ export default async function RootLayout({
             {isAdmin && (
               <Link
                 href="/admin"
-                className="px-4 py-2 text-sm font-semibold text-white bg-orange-500 border-2 border-orange-500 rounded-lg hover:bg-orange-600 hover:border-orange-600 transition-all shadow-md shadow-orange-500/20"
+                className="px-4 py-2 text-sm font-semibold text-white bg-orange-500 border-2 border-orange-500 rounded-xl hover:bg-orange-600 hover:border-orange-600 transition-all shadow-md shadow-orange-500/20"
               >
                 Admin Panel
               </Link>
             )}
             <Link
               href="/profile"
-              className="px-4 py-2 text-sm font-semibold text-[#0B5D57] bg-white rounded-lg hover:bg-orange-50 transition-colors shadow-sm"
+              className="px-4 py-2 text-sm font-semibold text-[#0B5D57] bg-white rounded-xl hover:bg-orange-50 transition-colors shadow-sm"
             >
               {isLoggedIn ? "Profile" : "Login"}
             </Link>

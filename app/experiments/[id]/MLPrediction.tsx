@@ -37,7 +37,7 @@ export default function MLPrediction() {
   };
 
   return (
-    <div className="bg-white border p-6 mt-6 rounded-lg shadow-sm">
+    <div className="bg-white border p-6 mt-6 rounded-xl shadow-sm">
       <h2 className="text-xl font-bold mb-4">ML Prediction (CSV)</h2>
 
       {/* FILE INPUT */}
@@ -60,7 +60,7 @@ export default function MLPrediction() {
         <button
           onClick={handlePredict}
           disabled={loading}
-          className={`px-5 py-2 rounded text-white font-semibold ${
+          className={`px-5 py-2 rounded-xl text-white font-semibold ${
             loading
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-green-600 hover:bg-green-700"
@@ -72,7 +72,7 @@ export default function MLPrediction() {
 
       {/* RESULT */}
       {prediction && (
-        <div className="mt-4 p-4 bg-green-50 rounded border">
+        <div className="mt-4 p-4 bg-green-50 rounded-xl border">
           <p><b>Result:</b> {prediction.result}</p>
           <p><b>Accuracy:</b> {prediction.accuracy}</p>
         </div>

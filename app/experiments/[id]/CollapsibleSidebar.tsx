@@ -75,7 +75,7 @@ export default function CollapsibleSidebar({
                   onClick={() => {
                     router.push(`/experiments/${exp.uuid}`);
                   }}
-                  className={`group p-4 rounded-2xl cursor-pointer transition-all duration-300 shadow-sm flex flex-col border
+                  className={`group p-4 rounded-xl cursor-pointer transition-all duration-300 shadow-sm flex flex-col border
                     ${isActive
                       ? "bg-[#d1f2eb] border-[#0B5D57] scale-[1.02] shadow-md"
                       : "bg-white/70 border-teal-50 hover:bg-white hover:scale-[1.03] hover:shadow-lg border-l-4 border-l-transparent hover:border-l-[#0B5D57]"
@@ -98,7 +98,7 @@ export default function CollapsibleSidebar({
               );
             })}
             {filteredExperiments.length === 0 && (
-              <div className="text-center p-8 bg-white/30 rounded-2xl border border-dashed border-teal-200">
+              <div className="text-center p-8 bg-white/30 rounded-xl border border-dashed border-teal-200">
                 <Beaker className="mx-auto text-teal-300 mb-2" size={32} />
                 <p className="text-slate-500 text-sm italic">No records found.</p>
               </div>
@@ -110,7 +110,7 @@ export default function CollapsibleSidebar({
       {/* TOGGLE BUTTON */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="absolute -right-8 top-1/2 -translate-y-1/2 h-16 bg-orange-500 w-8 flex items-center justify-center text-white rounded-r-2xl shadow-xl hover:bg-orange-600 focus:outline-none transition-all border-y-2 border-r-2 border-orange-600 z-50 group"
+        className="absolute -right-8 top-1/2 -translate-y-1/2 h-16 bg-orange-500 w-8 flex items-center justify-center text-white rounded-r-xl shadow-xl hover:bg-orange-600 focus:outline-none transition-all border-y-2 border-r-2 border-orange-600 z-50 group"
         title={isOpen ? "Collapse Sidebar" : "Expand Sidebar"}
       >
         {isOpen ? <ChevronLeft size={24} className="group-hover:-translate-x-1 transition-transform" /> : <ChevronRight size={24} className="group-hover:translate-x-1 transition-transform" />}
