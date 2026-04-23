@@ -3,8 +3,18 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-
-
+import {
+  Beaker,
+  Search,
+  Plus,
+  Trash2,
+  LayoutDashboard,
+  Activity,
+  Lock,
+  FlaskConical,
+  Clock,
+  ArrowRight
+} from "lucide-react";
 
 export default function ExperimentsPage() {
   const router = useRouter();
@@ -69,37 +79,49 @@ export default function ExperimentsPage() {
     exp.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  const stats = {
+    total: experiments.length,
+    private: experiments.filter(e => e.is_private).length,
+    public: experiments.filter(e => !e.is_private).length,
+  };
+
   return (
-    <div className="flex flex-1 min-h-0">
+    <div className="flex flex-1 h-full overflow-hidden">
 
       {/* 🔷 SIDEBAR */}
-      <div className="w-72 bg-gradient-to-b from-[#e8f6f3]/80 to-[#d1f2eb]/80 border-r-[6px] border-orange-500 p-4 flex flex-col shadow-md backdrop-blur-sm">
+      <div className="w-80 bg-gradient-to-b from-[#e8f6f3]/90 to-[#d1f2eb]/90 border-r-[6px] border-orange-500 p-6 flex flex-col shadow-xl backdrop-blur-md z-20">
 
-        <h2 className="text-xl font-bold mb-3 text-[#0B5D57]">
-          Experiments
-        </h2>
+        <div className="flex items-center gap-3 mb-6">
+          <FlaskConical className="text-[#0B5D57]" size={28} />
+          <h2 className="text-2xl font-bold text-[#0B5D57] tracking-tight">
+            Experiments
+          </h2>
+        </div>
 
         {/* 🔍 SEARCH */}
-        <input
-          type="text"
-          placeholder="Search experiment..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="mb-3 px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0B5D57]"
-        />
+        <div className="relative mb-6">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+          <input
+            type="text"
+            placeholder="Search laboratory..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 rounded-xl border border-teal-200 focus:outline-none focus:ring-2 focus:ring-[#0B5D57] shadow-inner bg-white/80 transition-all"
+          />
+        </div>
 
         {/* 🔥 CREATE BUTTON */}
         {isLoggedIn && (
           <Link
             href="/experiments/create"
-            className="mb-4 text-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg shadow-orange-300/50 hover:shadow-orange-400/70 transition transform hover:scale-105"
+            className="mb-8 flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 transition transform hover:scale-[1.02] active:scale-95"
           >
-            + Create Experiment
+            <Plus size={20} /> Create Experiment
           </Link>
         )}
 
         {/* LIST */}
-        <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+        <div className="flex-1 overflow-y-auto space-y-4 pr-1 custom-scrollbar">
           {filteredExperiments.map((exp, idx) => {
             const isActive = selectedId === exp.uuid;
 
@@ -110,37 +132,45 @@ export default function ExperimentsPage() {
                   setSelectedId(exp.uuid);
                   router.push(`/experiments/${exp.uuid}`);
                 }}
-                className={`group p-3 rounded-xl cursor-pointer transition-all duration-200 shadow-sm flex justify-between items-center border
-                  
+                className={`group p-4 rounded-2xl cursor-pointer transition-all duration-300 shadow-sm flex justify-between items-center border
                   ${isActive
-                    ? "bg-[#d1f2eb] border-l-4 border-[#0B5D57]"
-                    : "bg-white border-[#cce7e3] hover:bg-[#d1f2eb] hover:scale-[1.03] hover:shadow-md border-l-4 border-transparent hover:border-[#0B5D57]"
+                    ? "bg-[#d1f2eb] border-[#0B5D57] scale-[1.02] shadow-md"
+                    : "bg-white/70 border-teal-50 hover:bg-white hover:scale-[1.03] hover:shadow-lg border-l-4 border-l-transparent hover:border-l-[#0B5D57]"
                   }
                 `}
               >
-                <div>
-                  <p className="font-semibold text-[#0B5D57]">
+                <div className="flex-1 min-w-0">
+                  <p className={`font-bold truncate ${isActive ? "text-[#0B5D57]" : "text-slate-700 group-hover:text-[#0B5D57]"}`}>
                     {exp.name}
                   </p>
-                  {exp.is_private ? (
-                    <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 bg-slate-200 px-1.5 py-0.5 rounded mt-1 w-fit block">Private</span>
-                  ) : null}
+                  <div className="flex items-center gap-2 mt-1">
+                    {exp.is_private ? (
+                      <span className="flex items-center gap-1 text-[10px] uppercase font-black tracking-tighter text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full">
+                        <Lock size={10} /> Private
+                      </span>
+                    ) : (
+                      <span className="text-[10px] uppercase font-black tracking-tighter text-teal-600 bg-teal-100 px-2 py-0.5 rounded-full">Public</span>
+                    )}
+                  </div>
                 </div>
 
                 {isAdmin && (
                   <button
                     onClick={(e) => handleDelete(e, exp.uuid)}
-                    className="hidden group-hover:block bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600 transition"
+                    className="opacity-0 group-hover:opacity-100 p-2 text-red-400 hover:text-red-600 transition-all hover:bg-red-50 rounded-lg"
+                    title="Delete Experiment"
                   >
-                    Delete
+                    <Trash2 size={16} />
                   </button>
                 )}
               </div>
             );
           })}
+
           {filteredExperiments.length === 0 && !loading && (
-            <div className="text-center text-slate-500 mt-4 italic">
-              No experiments found.
+            <div className="text-center p-8 bg-white/30 rounded-2xl border border-dashed border-teal-200">
+              <Beaker className="mx-auto text-teal-300 mb-2" size={32} />
+              <p className="text-slate-500 text-sm italic">No experiments found.</p>
             </div>
           )}
         </div>

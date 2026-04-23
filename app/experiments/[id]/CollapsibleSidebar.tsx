@@ -2,11 +2,20 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { 
+  FlaskConical, 
+  Search, 
+  Plus, 
+  ChevronLeft, 
+  ChevronRight,
+  Lock,
+  Beaker
+} from "lucide-react";
 
 export default function CollapsibleSidebar({
   experiments,
   activeId,
-  isLoggedIn = true, // Default to true or passed from parent
+  isLoggedIn = true,
 }: {
   experiments: { uuid: string; name: string; is_private?: boolean; [key: string]: unknown }[];
   activeId: string;
@@ -21,36 +30,42 @@ export default function CollapsibleSidebar({
   );
 
   return (
-    <div className="relative flex shrink-0 h-full self-stretch">
+    <div className="relative flex shrink-0 h-full self-stretch z-30">
       {/* SIDEBAR */}
       <div 
-        className={`${isOpen ? "w-72 p-4" : "w-0 p-0 overflow-hidden"} 
-        bg-gradient-to-b from-[#e8f6f3]/80 to-[#d1f2eb]/80 border-r-[6px] border-orange-500 flex flex-col h-full shadow-md backdrop-blur-sm transition-all duration-300 ease-in-out`}
+        className={`${isOpen ? "w-80 p-6" : "w-0 p-0 overflow-hidden"} 
+        bg-gradient-to-b from-[#e8f6f3]/90 to-[#d1f2eb]/90 border-r-[6px] border-orange-500 flex flex-col h-full shadow-2xl backdrop-blur-md transition-all duration-500 ease-in-out`}
       >
         <div className="w-64 flex flex-col flex-1 min-h-0"> 
-          <h2 className="text-xl font-bold mb-3 text-[#0B5D57]">
-            Experiments
-          </h2>
+          <div className="flex items-center gap-3 mb-6">
+            <FlaskConical className="text-[#0B5D57]" size={28} />
+            <h2 className="text-2xl font-black text-[#0B5D57] tracking-tight">
+              Experiments
+            </h2>
+          </div>
 
-          <input
-            type="text"
-            placeholder="Search experiment..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="mb-4 px-3 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0B5D57] shadow-inner bg-white/50"
-          />
+          <div className="relative mb-6">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <input
+              type="text"
+              placeholder="Search lab..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 rounded-xl border border-teal-200 focus:outline-none focus:ring-2 focus:ring-[#0B5D57] shadow-inner bg-white/80 transition-all"
+            />
+          </div>
 
           {/* 🔥 CREATE BUTTON */}
           {isLoggedIn && (
             <button
               onClick={() => router.push("/experiments/create")}
-              className="mb-6 w-full text-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg shadow-orange-300/50 hover:shadow-orange-400/70 transition transform hover:scale-[1.02] active:scale-95"
+              className="mb-8 w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-black py-3 px-4 rounded-xl shadow-lg shadow-orange-500/20 transition transform hover:scale-[1.02] active:scale-95"
             >
-              + Create Experiment
+              <Plus size={20} /> New Experiment
             </button>
           )}
 
-          <div className="flex-1 overflow-y-auto space-y-3 pr-1 pt-1">
+          <div className="flex-1 overflow-y-auto space-y-4 pr-1 pt-1 custom-scrollbar">
             {filteredExperiments.map((exp, idx) => {
               const isActive = activeId === exp.uuid;
 
@@ -58,30 +73,34 @@ export default function CollapsibleSidebar({
                 <div
                   key={exp.uuid || idx}
                   onClick={() => {
-                    // router.push is better instead of Link because Link would require nested elements
                     router.push(`/experiments/${exp.uuid}`);
                   }}
-                  className={`group p-3 rounded-xl cursor-pointer transition-all duration-200 shadow-sm flex justify-between items-center border
+                  className={`group p-4 rounded-2xl cursor-pointer transition-all duration-300 shadow-sm flex flex-col border
                     ${isActive
-                      ? "bg-[#d1f2eb] border-l-4 border-[#0B5D57]"
-                      : "bg-white border-[#cce7e3] hover:bg-[#d1f2eb] hover:scale-[1.03] hover:shadow-md border-l-4 border-transparent hover:border-[#0B5D57]"
+                      ? "bg-[#d1f2eb] border-[#0B5D57] scale-[1.02] shadow-md"
+                      : "bg-white/70 border-teal-50 hover:bg-white hover:scale-[1.03] hover:shadow-lg border-l-4 border-l-transparent hover:border-l-[#0B5D57]"
                     }
                   `}
                 >
-                  <div className="w-full">
-                    <p className="font-semibold text-[#0B5D57] whitespace-normal">
-                      {exp.name}
-                    </p>
+                  <p className={`font-bold truncate ${isActive ? "text-[#0B5D57]" : "text-slate-700 group-hover:text-[#0B5D57]"}`}>
+                    {exp.name}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
                     {exp.is_private ? (
-                      <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 bg-slate-200 px-1.5 py-0.5 rounded mt-1 w-fit block">Private</span>
-                    ) : null}
+                      <span className="flex items-center gap-1 text-[10px] uppercase font-black tracking-tighter text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full">
+                        <Lock size={10} /> Private
+                      </span>
+                    ) : (
+                      <span className="text-[10px] uppercase font-black tracking-tighter text-teal-600 bg-teal-100 px-2 py-0.5 rounded-full">Public</span>
+                    )}
                   </div>
                 </div>
               );
             })}
             {filteredExperiments.length === 0 && (
-              <div className="text-center text-slate-500 mt-4 italic">
-                No experiments found.
+              <div className="text-center p-8 bg-white/30 rounded-2xl border border-dashed border-teal-200">
+                <Beaker className="mx-auto text-teal-300 mb-2" size={32} />
+                <p className="text-slate-500 text-sm italic">No records found.</p>
               </div>
             )}
           </div>
@@ -91,10 +110,10 @@ export default function CollapsibleSidebar({
       {/* TOGGLE BUTTON */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="absolute -right-6 top-4 h-12 bg-orange-500 w-6 flex items-center justify-center text-white rounded-r-md shadow-md hover:bg-orange-600 focus:outline-none transition-colors border-y border-r border-orange-600 z-50"
+        className="absolute -right-8 top-1/2 -translate-y-1/2 h-16 bg-orange-500 w-8 flex items-center justify-center text-white rounded-r-2xl shadow-xl hover:bg-orange-600 focus:outline-none transition-all border-y-2 border-r-2 border-orange-600 z-50 group"
         title={isOpen ? "Collapse Sidebar" : "Expand Sidebar"}
       >
-        {isOpen ? "◀" : "▶"}
+        {isOpen ? <ChevronLeft size={24} className="group-hover:-translate-x-1 transition-transform" /> : <ChevronRight size={24} className="group-hover:translate-x-1 transition-transform" />}
       </button>
     </div>
   );
