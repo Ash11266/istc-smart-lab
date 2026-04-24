@@ -79,9 +79,8 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
   }, [selectedDevice]);
 
   const metricsToDisplay = useMemo(() => {
-    const dataMetrics = new Set(data.map(d => d.metric?.toLowerCase()).filter(Boolean));
     if (allowedMetrics.length > 0) {
-      return allowedMetrics.filter(m => dataMetrics.has(m));
+      return allowedMetrics;
     }
     return Array.from(new Set(data.map(d => d.metric).filter(Boolean)));
   }, [data, allowedMetrics]);
@@ -332,7 +331,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
 
       {/* METRIC CHARTS */}
       <div className="flex flex-col gap-6 w-full mt-4 mb-2">
-        {metricsToDisplay.map((metric) => {
+        {metricsToDisplay.length > 0 ? metricsToDisplay.map((metric) => {
           const chartData = selectedDevice
             ? data.filter(d => d.device === selectedDevice && d.metric && d.metric.toLowerCase() === metric.toLowerCase())
             : data.filter(d => d.metric && d.metric.toLowerCase() === metric.toLowerCase());
@@ -344,7 +343,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
               <div className="flex-1 border border-slate-300 bg-white shadow-sm p-4 min-w-0">
                 <div className="flex flex-wrap items-center gap-4 mb-3">
                   <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium">Graph Type:</label>
+                    <label className="text-sm font-medium capitalize text-slate-700">{metric} Graph:</label>
                     <select
                       value={currentChartType}
                       onChange={(e) => {
@@ -382,24 +381,33 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
                   </div>
                 </div>
 
-                <div className="h-[300px] w-full">
-                  {currentChartType === "line" && (
-                    <MetricLineChart metric={metric} data={chartData} unit={chartUnits[metric]} />
-                  )}
-                  {currentChartType === "gauge" && (
-                    <MetricGaugeChart metric={metric} data={chartData} unit={chartUnits[metric]} />
-                  )}
-                  {currentChartType === "dial" && (
-                    <MetricDialChart metric={metric} data={chartData} unit={chartUnits[metric]} />
-                  )}
-                  {currentChartType === "area" && (
-                    <MetricAreaChart metric={metric} data={chartData} unit={chartUnits[metric]} />
-                  )}
-                  {currentChartType === "bar" && (
-                    <MetricBarChart metric={metric} data={chartData} unit={chartUnits[metric]} />
-                  )}
-                  {currentChartType === "scatter" && (
-                    <MetricScatterChart metric={metric} data={chartData} unit={chartUnits[metric]} />
+                <div className="h-[300px] w-full flex items-center justify-center">
+                  {chartData.length > 0 ? (
+                    <>
+                      {currentChartType === "line" && (
+                        <MetricLineChart metric={metric} data={chartData} unit={chartUnits[metric]} />
+                      )}
+                      {currentChartType === "gauge" && (
+                        <MetricGaugeChart metric={metric} data={chartData} unit={chartUnits[metric]} />
+                      )}
+                      {currentChartType === "dial" && (
+                        <MetricDialChart metric={metric} data={chartData} unit={chartUnits[metric]} />
+                      )}
+                      {currentChartType === "area" && (
+                        <MetricAreaChart metric={metric} data={chartData} unit={chartUnits[metric]} />
+                      )}
+                      {currentChartType === "bar" && (
+                        <MetricBarChart metric={metric} data={chartData} unit={chartUnits[metric]} />
+                      )}
+                      {currentChartType === "scatter" && (
+                        <MetricScatterChart metric={metric} data={chartData} unit={chartUnits[metric]} />
+                      )}
+                    </>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2 text-slate-400 italic">
+                      <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-400 rounded-full animate-spin"></div>
+                      Waiting for data...
+                    </div>
                   )}
                 </div>
               </div>
@@ -409,7 +417,20 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
               </div>
             </div>
           );
-        })}
+        }) : (
+          <div className="flex flex-col xl:flex-row gap-4 w-full">
+            <div className="flex-1 border border-slate-300 bg-white shadow-sm p-4 min-w-0 h-[380px] flex items-center justify-center">
+              <div className="flex flex-col items-center gap-2 text-slate-400 italic text-center">
+                <div className="w-12 h-12 border-4 border-slate-200 border-t-[#003366] rounded-full animate-spin mb-2"></div>
+                <p className="text-lg font-medium">Waiting for data stream...</p>
+                <p className="text-sm">Connect to start receiving experiment metrics</p>
+              </div>
+            </div>
+            <div className="w-full xl:w-64 shrink-0 border border-slate-300 bg-white shadow-sm p-4 flex flex-col justify-center">
+              <MetricStats data={[]} />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* TERMINAL */}
