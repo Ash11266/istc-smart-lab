@@ -51,7 +51,7 @@ export default async function RootLayout({
             </Link>
           </div>
 
-          <h1 className="text-xl md:text-3xl font-semibold text-white tracking-wide text-center absolute left-1/2 transform -translate-x-1/2">
+          <h1 className="text-5xl md:text-3xl font-bold text-white tracking-wide text-center absolute left-1/2 transform -translate-x-1/2">
             Data Acquisition & Monitoring System
           </h1>
 
