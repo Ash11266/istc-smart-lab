@@ -41,9 +41,10 @@ export async function POST(req: NextRequest) {
       name: "session",
       value: token,
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false, // Set to true only if serving over HTTPS
       path: "/",
       maxAge: 60 * 60 * 24, // 1 day
+      sameSite: "lax",
     });
 
     return response;
