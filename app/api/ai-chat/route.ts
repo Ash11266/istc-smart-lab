@@ -6,6 +6,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 export async function POST(req: Request) {
   try {
     const { message, experiment, history = [] } = await req.json();
+    console.log("🤖 Incoming AI request:", message);
 
     const lowerMsg = message.toLowerCase();
 
@@ -114,7 +115,7 @@ Data: ${experiment?.dataValues || "N/A"}
     ];
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: {
@@ -125,6 +126,10 @@ Data: ${experiment?.dataValues || "N/A"}
     );
 
     const data = await response.json();
+    if (data.error) {
+      console.error("GEMINI API ERROR:", data.error);
+      return NextResponse.json({ result: "AI Error: " + data.error.message }, { status: 500 });
+    }
 
     let text =
       data?.candidates?.[0]?.content?.parts?.[0]?.text ||
