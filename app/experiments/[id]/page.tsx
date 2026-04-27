@@ -148,10 +148,6 @@ export default async function ExperimentPage({
                 <Activity size={24} className="text-orange-400" />
                 <h2 className="text-xl font-black tracking-tight uppercase">Live Telemetry Stream</h2>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
-                <span className="text-[10px] font-black text-white/70 uppercase tracking-widest">Active Connection</span>
-              </div>
             </div>
             <div className="p-8">
               <ExperimentStream dataValues={experiment.dataValues} />

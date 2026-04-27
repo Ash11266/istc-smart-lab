@@ -93,17 +93,16 @@ export default async function RootLayout({
 
         {/* FOOTER */}
         <footer
-          className="w-full h-14 flex items-center justify-center text-white text-sm tracking-wide border-t-[5px] border-orange-400 gap-3 relative z-20"
+          className="w-full h-14 flex items-center justify-between px-6 text-white text-sm tracking-wide border-t-[5px] border-orange-400 relative z-20"
           style={{ backgroundColor: "#0B5D57" }}
         >
           <span>Research Laboratory Interface</span>
-          <span>|</span>
-          <span>
-            Time:{" "}
+          <div className="flex items-center gap-2">
+            <span>Time:</span>
             <span className="font-semibold text-yellow-300">
               <LiveTime />
             </span>
-          </span>
+          </div>
         </footer>
 
       </body>
