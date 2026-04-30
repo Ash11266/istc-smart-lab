@@ -17,6 +17,14 @@ type MqttMessage = {
   value: number | string;
   timestamp: string;
 };
+const generatePasskey = () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < 10; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
 
 export default function ExperimentStream({ dataValues }: { dataValues?: string }) {
 
@@ -32,6 +40,7 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
   const [deviceInput, setDeviceInput] = useState("");
   const [selectedDevice, setSelectedDevice] = useState("");
   const [customCommand, setCustomCommand] = useState("");
+  const [passkeyInput, setPasskeyInput] = useState(generatePasskey);
 
   type ChartType = "line" | "gauge" | "dial" | "bar" | "area" | "scatter";
   const [chartTypes, setChartTypes] = useState<Record<string, ChartType>>({});
@@ -78,6 +87,12 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
     selectedDeviceRef.current = selectedDevice;
   }, [selectedDevice]);
 
+  const passkeyInputRef = useRef(passkeyInput);
+
+  useEffect(() => {
+    passkeyInputRef.current = passkeyInput;
+  }, [passkeyInput]);
+
   const metricsToDisplay = useMemo(() => {
     if (allowedMetrics.length > 0) {
       return allowedMetrics;
@@ -108,6 +123,12 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
         };
 
         const currentDevice = selectedDeviceRef.current;
+        const currentPasskey = passkeyInputRef.current;
+
+        // Filter by passkey: device payload must include the matching passkey
+        if (String(raw.passkey) !== currentPasskey) {
+          return;
+        }
 
         if (allowedMetrics.length > 0 && message.metric && !allowedMetrics.includes(message.metric.toLowerCase())) return;
 
@@ -190,15 +211,49 @@ export default function ExperimentStream({ dataValues }: { dataValues?: string }
         <button onClick={disconnect} className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 transition-colors">Disconnect</button>
       </div>
 
-      {/* FILTER */}
-      <div className="flex gap-2">
+      {/* FILTER & PASSKEY */}
+      <div className="flex gap-2 flex-wrap">
         <input
           value={deviceInput}
           onChange={(e) => setDeviceInput(e.target.value)}
-          placeholder="Device filter (leave empty for all)"
+          placeholder="Device filter"
           className="border p-2 flex-1 max-w-md focus:outline-none focus:ring-2 focus:ring-[#003366]"
         />
         <button onClick={applyDeviceFilter} className="bg-[#003366] text-white px-6 hover:bg-slate-800 transition-colors">Apply</button>
+
+        <div className="w-px bg-slate-300 mx-2 hidden sm:block"></div>
+
+        <div className="flex-1 max-w-xs relative flex items-center group">
+          <input
+            value={passkeyInput}
+            onChange={(e) => setPasskeyInput(e.target.value)}
+            title="Session Passkey"
+            className="border p-2 w-full pr-10 focus:outline-none focus:ring-2 focus:ring-indigo-600 bg-white font-mono font-bold tracking-widest text-indigo-700"
+          />
+          <span className="absolute -top-2.5 left-2 bg-white px-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Passkey</span>
+          <button
+            onClick={() => setPasskeyInput(generatePasskey())}
+            className="absolute right-2 text-slate-400 hover:text-indigo-600 transition-colors"
+            title="Regenerate Passkey"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" /><path d="M16 21v-5h5" /></svg>
+          </button>
+        </div>
+        <button
+          onClick={() => {
+            if (passkeyInput.trim()) {
+              const targetDevice = selectedDevice || (data.length > 0 ? data[data.length - 1].device : "");
+              sendControlCommand(targetDevice, passkeyInput.trim());
+              setTimeout(() => {
+                sendControlCommand(targetDevice, "start");
+              }, 200);
+            }
+          }}
+          disabled={!passkeyInput.trim() || (!selectedDevice && data.length === 0)}
+          className={`px-6 py-2 text-white transition-colors ${(!passkeyInput.trim() || (!selectedDevice && data.length === 0)) ? "bg-slate-300 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-800"}`}
+        >
+          Auth & Start
+        </button>
       </div>
 
       {/* CONTROL TOOLS */}
