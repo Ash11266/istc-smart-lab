@@ -737,7 +737,7 @@ Send commands to connected devices:
 
 | Role | Email | Password |
 |---|---|---|
-| **Admin** | `admin@smartlab.com` | `admin123` |
+| **Admin** | `admin@smartlab.com` |  —  |
 | **Bulk-imported users** | _(as specified in file)_ | `istc@12345` |
 | **Reset password default** | — | `istc@12345` |
 
